@@ -1,34 +1,55 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import {
+  createRoutesFromElements,
+  createBrowserRouter,
+  RouterProvider,
+  Route,
+  Outlet,
+  Navigate,
+} from 'react-router-dom'
+import { CssVarsProvider, ScopedCssBaseline } from '@mui/joy'
+
+import { useAuthenticated } from '@hooks/useAuthenticated'
+import theme from '@config/theme'
+
+import ForgotPassword from '@pages/ForgotPassword'
+import SignUp from '@pages/SignUp'
+import SignIn from '@pages/SignIn'
+import Home from '@pages/Home'
+
+import AuthenticationLayout from '@components/AuthenticationLayout'
+import Layout from '@components/Layout'
+
+import '@styles/globals.scss'
+// import 'animate.css/animate.css'
+
+const AuthenticatedRoute = () => {
+  const { isAuthenticated } = useAuthenticated()
+  return isAuthenticated ? <Outlet /> : <Navigate to="/auth/sign-in" />
+}
+
+const router = createBrowserRouter(
+  createRoutesFromElements(
+    <Route path="/" element={<Layout />}>
+      <Route path="auth" element={<AuthenticationLayout />}>
+        <Route path="sign-up" element={<SignUp />} />
+        <Route path="sign-in" element={<SignIn />} />
+        <Route path="forgot-password" element={<ForgotPassword />} />
+      </Route>
+
+      <Route path="/" element={<AuthenticatedRoute />}>
+        <Route path="/" element={<Home />}/>
+      </Route>
+    </Route>
+  )
+)
 
 function App() {
-  const [count, setCount] = useState(0)
-
   return (
-    <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
+    <CssVarsProvider theme={theme} defaultMode="dark">
+      <ScopedCssBaseline>
+        <RouterProvider router={router} fallbackElement={<span>Fallback?</span>} />
+      </ScopedCssBaseline>
+    </CssVarsProvider>
   )
 }
 

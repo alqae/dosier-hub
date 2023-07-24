@@ -1,0 +1,8 @@
+.wrapper {
+  height: 100vw; // fallback for browsers that don't support custom units
+  height: 100dvh; // dvh is a custom unit from safari - 100% of the viewport height, even when the address bar is visible
+}
+
+.half {
+  background-color: var(--ds-palette-primary-solidBg);
+}
