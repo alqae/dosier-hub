@@ -12,6 +12,9 @@ import { useAuthenticated } from '@hooks/useAuthenticated'
 import theme from '@config/theme'
 
 import ForgotPassword from '@pages/ForgotPassword'
+import ProjectDetail from '@pages/ProjectDetail'
+import Projects from '@pages/Projects'
+import Profile from '@pages/Profile'
 import SignUp from '@pages/SignUp'
 import SignIn from '@pages/SignIn'
 import Home from '@pages/Home'
@@ -20,7 +23,6 @@ import AuthenticationLayout from '@components/AuthenticationLayout'
 import Layout from '@components/Layout'
 
 import '@styles/globals.scss'
-// import 'animate.css/animate.css'
 
 const AuthenticatedRoute = () => {
   const { isAuthenticated } = useAuthenticated()
@@ -38,6 +40,9 @@ const router = createBrowserRouter(
 
       <Route path="/" element={<AuthenticatedRoute />}>
         <Route path="/" element={<Home />}/>
+        <Route path="profile" element={<Profile />}/>
+        <Route path="projects" element={<Projects />}/>
+        <Route path="projects/:projectId" element={<ProjectDetail />}/>
       </Route>
     </Route>
   )

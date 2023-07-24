@@ -14,10 +14,10 @@ export const useAuthenticated = (): {
     const headers = new Headers()
     headers.set('Authorization', `Bearer ${token}`)
     fetch(`${apiURL}/api/whoami`, { headers })
-      .then<Api.Response<Models.User | undefined>>(res => res.json())
+      .then<Models.User | undefined>(res => res.json())
       .then(res => {
-        userLogged = res.data
-        dispatch(setUserLogged(res.data))
+        userLogged = res
+        dispatch(setUserLogged(res))
       })
   }
   return {

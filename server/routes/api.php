@@ -26,9 +26,9 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 Route::middleware([ 'auth:sanctum' ])->group(function() {
     Route::get('/whoami', [AuthController::class, 'whoAmI']);
     Route::post('/users/avatar', [UserController::class, 'uploadAvatar']);
-    Route::get('/files/{filename}', [UserController::class, 'getFile']);
     Route::post('/sign-out', [AuthController::class, 'signOut']);
 });
+Route::get('/files/{filename}', [UserController::class, 'getFile']);
 // Authentication
 Route::post('/sign-up', [AuthController::class, 'signUp']);
 Route::post('/sign-in', [AuthController::class, 'signIn']);

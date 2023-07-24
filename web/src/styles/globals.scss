@@ -1,1 +1,17 @@
 @import "reset";
+
+
+// Global styles
+body, #root {
+  height: 100vh;
+}
+
+.MuiScopedCssBaseline-root {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+main {
+  flex: 1;
+}
