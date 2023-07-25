@@ -1,4 +1,5 @@
 import React from 'react'
+import { toast } from 'react-toastify'
 
 import WarningRoundedIcon from '@mui/icons-material/WarningRounded'
 import ModalDialog from '@mui/joy/ModalDialog'
@@ -28,6 +29,7 @@ const DeleteProjectModal:React.FC<IDeleteProjectModalProps> = ({
     const response = await deleteProject(projectId)
     if ('error' in response) return
     if (onDelete) onDelete()
+    toast.success('Project deleted successfully')
   }
 
   return (

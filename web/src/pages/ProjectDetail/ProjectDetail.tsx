@@ -2,7 +2,10 @@ import React, { useMemo, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 
 import Typography, { TypographyPropsColorOverrides } from '@mui/joy/Typography'
+import CircularProgress from '@mui/material/CircularProgress'
 import CalendarIcon from '@mui/icons-material/CalendarMonth'
+import ArrowBackIcon from '@mui/icons-material/ArrowBack'
+import SearchOffIcon from '@mui/icons-material/SearchOff'
 import type { OverridableStringUnion } from '@mui/types'
 import BadgeIcon from '@mui/icons-material/BadgeSharp'
 import ListItemButton from '@mui/joy/ListItemButton'
@@ -25,9 +28,10 @@ import Grid from '@mui/joy/Grid'
 import List from '@mui/joy/List'
 
 import DeleteProjectModal from '@components/DeleteProjectModal'
+import { ProjectStatus } from '@/types/project-status.enum'
 import { useGetProjectQuery } from '@services/api'
 import { getFileURL } from '@utils/getFileURL'
-import { ProjectStatus } from '@/types'
+import { getInitials } from '@/utils'
 
 interface IProjectDetailProps {
   children?: React.ReactNode
@@ -39,7 +43,7 @@ const ProjectDetail: React.FC<IProjectDetailProps> = () => {
   const { projectId } = useParams()
   const navigate = useNavigate()
 
-  const { data: project } = useGetProjectQuery(Number(projectId), { skip: !projectId, refetchOnMountOrArgChange: true })
+  const { data: project, isLoading } = useGetProjectQuery(Number(projectId), { skip: !projectId, refetchOnMountOrArgChange: true })
 
   const statusColor = useMemo<OverridableStringUnion<ColorPaletteProp, TypographyPropsColorOverrides>>(
       () => {
@@ -55,6 +59,33 @@ const ProjectDetail: React.FC<IProjectDetailProps> = () => {
       }
     }, [project?.status]
   )
+
+  if (isLoading) {
+    return (
+      <AspectRatio variant="plain">
+        <CircularProgress/>
+      </AspectRatio>
+    )
+  }
+
+  if (!project) {
+    return (
+      <AspectRatio variant="plain">
+        <div>
+          <SearchOffIcon sx={{ color: 'text.tertiary', fontSize: '25rem' }} />
+          <div>
+            <Typography level="h1" mb={3}>Project not found</Typography>
+            <Button
+              startDecorator={<ArrowBackIcon />}
+              onClick={() => navigate('/projects')}
+            >
+              Back to projects
+            </Button>
+          </div>
+        </div>
+      </AspectRatio>
+    )
+  }
 
   return (
     <>
@@ -104,12 +135,20 @@ const ProjectDetail: React.FC<IProjectDetailProps> = () => {
           </form>
         </ModalDialog>
       </Modal>
+
       <Grid container spacing={5} mt={5}>
         <Grid xs={8}>
-          <Typography level="h1" mb={3}>{project?.name}</Typography>
+          <Button
+            variant="plain"
+            startDecorator={<ArrowBackIcon />}
+            onClick={() => navigate('/projects')}
+          >
+            Go Back
+          </Button>
+          <Typography level="h1" mb={3}>{project.name}</Typography>
 
           <Typography level="h2" mb={1} fontWeight="bold">Description</Typography>
-          <Typography mb={5}>{project?.description}</Typography>
+          <Typography mb={5}>{project.description}</Typography>
 
           <Stack direction="row" justifyContent="space-between" alignItems="center">
             <Typography level="h3" mb={1} fontWeight="bold">Tasks</Typography>
@@ -128,13 +167,13 @@ const ProjectDetail: React.FC<IProjectDetailProps> = () => {
         <Grid xs={4}>
           <AspectRatio variant="plain" ratio="1/1">
             <Avatar
-              src={project ? getFileURL(project?.avatar) : undefined}
+              src={project ? getFileURL(project.avatar) : undefined}
               sx={{ width: '100%', height: 'auto' }}
             />
           </AspectRatio>
 
           <Typography variant="outlined" display="inline-block" color={statusColor} mb={1} mx={0}>
-            {project?.status}
+            {project.status}
           </Typography>
 
           <List
@@ -147,10 +186,25 @@ const ProjectDetail: React.FC<IProjectDetailProps> = () => {
             }}
           >
             <ListItem nested>
+              <ListSubheader><BadgeIcon sx={{ mr: 1 }} />Leader</ListSubheader>
+              <List>
+                <ListItem>
+                  <Typography startDecorator={
+                    <Avatar
+                      src={getFileURL(project.user?.avatar)}  
+                    >{getInitials(project.user?.name)}</Avatar>
+                  }>
+                    {project.user?.name}
+                  </Typography>
+                </ListItem>
+              </List>
+            </ListItem>
+
+            <ListItem nested>
               <ListSubheader><BadgeIcon sx={{ mr: 1 }} />Alias</ListSubheader>
               <List>
                 <ListItem>
-                  <ListItemButton>{project?.alias}</ListItemButton>
+                  <ListItemButton>{project.alias}</ListItemButton>
                 </ListItem>
               </List>
             </ListItem>
@@ -159,7 +213,7 @@ const ProjectDetail: React.FC<IProjectDetailProps> = () => {
               <ListSubheader><CalendarIcon sx={{ mr: 1 }} />Initial Date</ListSubheader>
               <List>
                 <ListItem>
-                  <ListItemButton>{project?.initial_date}</ListItemButton>
+                  <ListItemButton>{project.initial_date}</ListItemButton>
                 </ListItem>
               </List>
             </ListItem>
@@ -168,7 +222,7 @@ const ProjectDetail: React.FC<IProjectDetailProps> = () => {
               <ListSubheader><CalendarIcon sx={{ mr: 1 }} />Final Date</ListSubheader>
               <List>
                 <ListItem>
-                  <ListItemButton>{project?.final_date}</ListItemButton>
+                  <ListItemButton>{project.final_date}</ListItemButton>
                 </ListItem>
               </List>
             </ListItem>

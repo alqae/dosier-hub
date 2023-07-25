@@ -1,5 +1,6 @@
 import React from 'react'
 import * as Yup from 'yup'
+import { toast } from 'react-toastify'
 import { useForm } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
 import { useNavigate, useSearchParams } from 'react-router-dom'
@@ -56,6 +57,7 @@ const ForgotPassword: React.FC<IForgotPasswordProps> = () => {
   const onForgotPassword = async (values: ForgotPasswordForm) => {
     const response = await forgotPassword(values)
     if ('error' in response) return
+    toast.success('Email sent successfully')
     return navigate('/auth/sign-in')
   }
 
@@ -74,7 +76,6 @@ const ForgotPassword: React.FC<IForgotPasswordProps> = () => {
   const onResetPassword = async (values: ResetPasswordForm) => {
     if (!token) return
     const response = await resetPassword({ password: values.password, token })
-    console.warn(response);
     if ('error' in response) return
     return navigate('/auth/sign-in')
   }

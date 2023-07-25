@@ -9,6 +9,12 @@ use Illuminate\Support\Str;
 
 class UserController extends Controller
 {
+    public function getAll() {
+        return response()->json(User::all());
+    }
+    public function getUser($id) {
+        return response()->json(User::find($id));
+    }
     public function uploadAvatar(Request $request) {
         if ($request->hasFile('avatar')) {
             /** @var User $user */
@@ -19,6 +25,30 @@ class UserController extends Controller
             return response()->json([ 'success' => $filename ]);
         }
         return response()->json([ 'message' => 'File not found' ]);
+    }
+    public function updateProfile(Request $request, $id) {
+        $validated = $request->validate([
+            'name' => 'required',
+            'email' => 'required',
+        ]);
+        $userByEmail = User::where('email', $validated['email']);
+        if ($userByEmail->count() > 0) {
+            $userByEmail = $userByEmail->first();
+            if ($userByEmail->id != $id) {
+                return response()->json([ 'message' => 'Email already exists' ], 400);
+            }
+        }
+        $user = User::find($id);
+        $user->update($validated);
+        return response()->json($user);
+    }
+    public function updatePassword(Request $request, $id) {
+        $validated = $request->validate([
+            'password' => 'required',
+        ]);
+        $user = User::find($id);
+        $user->update([ 'password' => bcrypt($validated['password']) ]);
+        return response()->json($user);
     }
     public function getFile($filename) {
         return response()->file(

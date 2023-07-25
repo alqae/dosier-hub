@@ -87,4 +87,14 @@ namespace Api {
       final_date: string
     }
   }
+  // Users
+  namespace User {
+    type UpdateProfileRequest = { 
+      name: string
+      email: string
+    }
+    type UpdatePasswordRequest = {
+      password: string
+    }
+  }   
 }

@@ -12,6 +12,7 @@ import FormControl from '@mui/joy/FormControl'
 import Typography from '@mui/joy/Typography'
 import FormLabel from '@mui/joy/FormLabel'
 import Textarea from '@mui/joy/Textarea'
+import Avatar from '@mui/joy/Avatar'
 import Select from '@mui/joy/Select'
 import Option from '@mui/joy/Option'
 import Button from '@mui/joy/Button'
@@ -20,9 +21,9 @@ import Input from '@mui/joy/Input'
 import Grid from '@mui/joy/Grid'
 import Box from '@mui/joy/Box'
 
+import { ProjectStatus } from '@/types/project-status.enum'
 import { useGetUsersQuery } from '@services/api'
-import { getFileURL } from '@utils/getFileURL'
-import { ProjectStatus } from '@/types'
+import { getFileURL, getInitials } from '@utils'
 
 interface IProjectFormProps {
   children?: React.ReactNode
@@ -223,12 +224,7 @@ const ProjectForm:React.FC<IProjectFormProps> = ({
                 renderOption={(props, option) => (
                   <AutocompleteOption {...props} value={option.id}>
                     <ListItemDecorator>
-                      <img
-                        loading="lazy"
-                        width="30"
-                        src={getFileURL(option.avatar)}
-                        alt={option.name}
-                      />
+                      <Avatar src={getFileURL(option.avatar)}>{getInitials(option.name)}</Avatar>
                     </ListItemDecorator>
                     <ListItemContent sx={{ fontSize: 'sm' }}>
                       {option.name}

@@ -1,4 +1,5 @@
 import logger from 'redux-logger'
+import { toast } from 'react-toastify'
 import { persistReducer } from 'redux-persist'
 import storage from 'redux-persist/lib/storage'
 import thunk, { ThunkDispatch } from 'redux-thunk'
@@ -6,9 +7,9 @@ import { TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux'
 import {
   configureStore,
   combineReducers,
-  // MiddlewareAPI,
-  // Middleware,
-  // isRejectedWithValue,
+  MiddlewareAPI,
+  Middleware,
+  isRejectedWithValue,
   AnyAction,
   Store
 } from '@reduxjs/toolkit'
@@ -24,20 +25,14 @@ const reducer = combineReducers({
   [api.reducerPath]: api.reducer,
 })
 
-// export const httpErrorInterceptor: Middleware = (api: MiddlewareAPI) => (next) => (action) => {
-//   if (isRejectedWithValue(action)) {
-//     console.warn('We got a rejected action!', api)
-//     api.dispatch(
-//       addToast({
-//         variant: 'danger',
-//         text: action.payload.error ?? action.payload.message ?? 'Something went wrong',
-//         position: 'bottomCenter'
-//       })
-//     )
-//   }
+export const httpErrorInterceptor: Middleware = (_: MiddlewareAPI) => (next) => (action) => {
+  if (isRejectedWithValue(action)) {
+    const message = action.payload?.error ?? 'Something went wrong'
+    toast.error(message)
+  }
 
-//   return next(action)
-// }
+  return next(action)
+}
 
 const middleware = [
   thunk,
@@ -51,7 +46,7 @@ const middleware = [
       ]
   ),
   api.middleware,
-  // httpErrorInterceptor,
+  httpErrorInterceptor,
 ]
 
 const persistConfig = {

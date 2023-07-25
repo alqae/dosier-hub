@@ -44,9 +44,9 @@ const AvatarPicker:React.FC<IAvatarPickerProps> = ({ defaultValue, onChange }) =
             onClick={() => openFileSelector()}
             size="sm"
             color="primary"
-            sx={{ padding: 0 }}
+            sx={{ padding: 0, borderRadius: '50%' }}
           >
-            {filesContent.length > 0 ? <EditIcon /> : <AddIcon />}
+            {(filesContent.length > 0 || defaultValue) ? <EditIcon /> : <AddIcon />}
           </IconButton>
         }
         badgeInset="14%"

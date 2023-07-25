@@ -4,14 +4,17 @@ import { useNavigate } from 'react-router-dom'
 
 import LinearProgress from '@mui/joy/LinearProgress'
 import DeleteIcon from '@mui/icons-material/Delete'
+import ImageIcon from '@mui/icons-material/Image'
 import Typography from '@mui/joy/Typography'
 import IconButton from '@mui/joy/IconButton'
+import Avatar from '@mui/joy/Avatar'
 import Table from '@mui/joy/Table'
 import Sheet from '@mui/joy/Sheet'
+import Link from '@mui/joy/Link'
 
 import DeleteProjectModal from '@components/DeleteProjectModal'
 import { useGetProjectsQuery } from '@services/api'
-import { getFileURL } from '@utils/getFileURL'
+import { getFileURL, getInitials } from '@utils'
 
 interface IProjectsProps {
   children?: React.ReactNode
@@ -60,61 +63,88 @@ const Projects: React.FC<IProjectsProps> = () => {
           backgroundPosition:
             '0 var(--TableHeader-height), 0 100%, 0 var(--TableHeader-height), 0 100%',
           backgroundColor: 'background.surface',
+          ...(!projects?.length && !isLoading ? {
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center'
+          } : {})
         }}
       >
-        {isLoading && <LinearProgress />}
-        <Table stickyHeader className={styles.table}>
-          <thead>
-            <tr>
-              <th></th>
-              <th>Name</th>
-              <th>Alias</th>
-              <th>User</th>
-              <th>Status</th>
-              <th>Initial Date</th>
-              <th>Final Date</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {projects?.map((project) => (
-              <tr key={project.name} className={styles.project} onClick={(event) => {
-                event.preventDefault();
-                const target = event.target as HTMLElement;
-                const targetTagName = target.tagName.toLowerCase()
-                const allowedTags = ['td', 'tr']
-                if (!allowedTags.includes(targetTagName)) return
-                return navigate(`/projects/${project.id}`)
-              }}>
-                <td>
-                  <img src={getFileURL(project.avatar)} alt={project.name} />
-                </td>
-                <td>{project.name}</td>
-                <td>{project.alias}</td>
-                <td>
-                  <Typography
-                    startDecorator={<img src={getFileURL(project.avatar)} alt={project.name} />}
-                    sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1 }}
-                  >
-                    {project.user.name}
-                  </Typography>
-                </td>
-                <td>{project.status}</td>
-                <td>{project.initial_date}</td>
-                <td>{project.final_date}</td>
-                <td>
-                  <IconButton
-                    size="sm"
-                    variant="outlined"
-                    onClick={() => setProjectToDelete(project.id)}
-                  >
-                    <DeleteIcon />
-                  </IconButton>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </Table>
+        {isLoading ? <LinearProgress /> : (
+          !projects?.length ? (
+            <Typography level="h2" mb={3}>
+              No projects found, <Link onClick={() => navigate('/projects/new')}>create one</Link>
+            </Typography>
+          ) : (
+            <Table stickyHeader className={styles.table}>
+              <thead>
+                <tr>
+                  <th></th>
+                  <th>Name</th>
+                  <th>Alias</th>
+                  <th>User</th>
+                  <th>Status</th>
+                  <th>Initial Date</th>
+                  <th>Final Date</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {projects?.map((project) => (
+                  <tr key={project.name} className={styles.project} onClick={(event) => {
+                    event.preventDefault();
+                    const target = event.target as HTMLElement;
+                    const targetTagName = target.tagName.toLowerCase()
+                    const allowedTags = ['td', 'tr']
+                    if (!allowedTags.includes(targetTagName)) return
+                    return navigate(`/projects/${project.id}`)
+                  }}>
+                    <td>
+                      <Avatar
+                        src={getFileURL(project.avatar)}
+                        alt={project.name}
+                        size="sm"
+                        sx={{ mx: 'auto' }}
+                      >
+                        <ImageIcon />
+                      </Avatar>
+                    </td>
+                    <td>{project.name}</td>
+                    <td>{project.alias}</td>
+                    <td>
+                      <Typography
+                        startDecorator={
+                          <Avatar
+                            src={getFileURL(project.user.avatar)}
+                            alt={project.name}
+                            size="sm"
+                          >
+                            {getInitials(project.user.name)}
+                          </Avatar>
+                        }
+                        sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1 }}
+                      >
+                        {project.user.name}
+                      </Typography>
+                    </td>
+                    <td>{project.status}</td>
+                    <td>{project.initial_date}</td>
+                    <td>{project.final_date}</td>
+                    <td>
+                      <IconButton
+                        size="sm"
+                        variant="outlined"
+                        onClick={() => setProjectToDelete(project.id)}
+                      >
+                        <DeleteIcon />
+                      </IconButton>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </Table>
+          )
+        )}
       </Sheet>
     </>
   )

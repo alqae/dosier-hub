@@ -6,6 +6,7 @@ import {
   Outlet,
   Navigate,
 } from 'react-router-dom'
+import { ToastContainer } from 'react-toastify'
 import { CssVarsProvider, ScopedCssBaseline } from '@mui/joy'
 
 import { useAuthenticated } from '@hooks/useAuthenticated'
@@ -25,6 +26,7 @@ import AuthenticationLayout from '@components/AuthenticationLayout'
 import Layout from '@components/Layout'
 
 import '@styles/globals.scss'
+import 'react-toastify/dist/ReactToastify.min.css'
 
 const AuthenticatedRoute = () => {
   const { isAuthenticated } = useAuthenticated()
@@ -54,11 +56,14 @@ const router = createBrowserRouter(
 
 function App() {
   return (
-    <CssVarsProvider theme={theme} defaultMode="dark">
-      <ScopedCssBaseline>
-        <RouterProvider router={router} fallbackElement={<span>Fallback?</span>} />
-      </ScopedCssBaseline>
-    </CssVarsProvider>
+    <>
+      <CssVarsProvider theme={theme} defaultMode="dark">
+        <ScopedCssBaseline>
+          <RouterProvider router={router} fallbackElement={<span>Fallback?</span>} />
+        </ScopedCssBaseline>
+      </CssVarsProvider>
+      <ToastContainer />
+    </>
   )
 }
 

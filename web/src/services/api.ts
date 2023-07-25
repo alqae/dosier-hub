@@ -68,6 +68,23 @@ export const api = createApi({
     getUsers: builder.query<Models.User[], void>({
       query: () => `users`,
     }),
+    getUser: builder.query<Models.User, number>({
+      query: (id) => `users/${id}`,
+    }),
+    updateProfile: builder.mutation<Models.User, Api.User.UpdateProfileRequest & { userId: Models.User['id'] }>({
+      query: ({ userId, ...body }) => ({
+        url: `users/${userId}`,
+        method: 'PUT',
+        body,
+      }),
+    }),
+    updatePassword: builder.mutation<Models.User, Api.User.UpdatePasswordRequest & { userId: Models.User['id'] }>({
+      query: ({ userId, ...body }) => ({
+        url: `users/${userId}/password`,
+        method: 'PUT',
+        body,
+      }),
+    }),
     uploadAvatar: builder.mutation<{ success: string }, FormData>({
       query: (body) => ({
         url: 'users/avatar',
@@ -121,6 +138,9 @@ export const {
   useResetPasswordMutation,
   // Users
   useGetUsersQuery,
+  useGetUserQuery,
+  useUpdateProfileMutation,
+  useUpdatePasswordMutation,
   useUploadAvatarMutation,
   // Projects
   useGetProjectsQuery,

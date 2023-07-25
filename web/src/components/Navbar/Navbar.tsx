@@ -18,7 +18,7 @@ import Box from '@mui/joy/Box'
 
 import { useAuthenticated } from '@hooks/useAuthenticated'
 import { signOut, useAppDispatch } from '@store'
-import { getFileURL } from '@utils/getFileURL'
+import { getInitials, getFileURL } from '@utils'
 import Logo from '@assets/logo.svg'
 
 interface INavbarProps {
@@ -80,7 +80,7 @@ const Navbar: React.FC<INavbarProps> = () => {
             </Button>
 
             <IconButton sx={{ borderRadius: 'xl' }} onClick={(event) => setAnchorEl(event.currentTarget)}>
-              <Avatar src={avatarURL} size="sm" />
+              <Avatar src={avatarURL} size="sm">{getInitials(userLogged?.name)}</Avatar>
               <KeyboardArrowDownIcon />
             </IconButton>
 
