@@ -145,7 +145,42 @@ export const api = createApi({
         url: `/tasks/${id}`,
         method: 'DELETE',
       }),
-    })
+    }),
+    // Projects - Tasks - Comments
+    getComments: builder.query<Models.Comment[], number>({
+      query: (id) => `tasks/${id}/comments`,
+    }),
+    createComment: builder.mutation<Models.Comment, Api.Project.Comment.CreateCommentRequest>({
+      query: (body) => ({
+        url: `tasks/${body.task_id}/comments`,
+        method: 'POST',
+        body,
+      }),
+    }),
+    updateComment: builder.mutation<Models.Comment, Partial<Models.Comment>>({
+      query: ({ id, ...body }) => ({
+        url: `comments/${id}`,
+        method: 'PUT',
+        body,
+      }),
+    }),
+    deleteComment: builder.mutation<void, number>({
+      query: (id) => ({
+        url: `comments/${id}`,
+        method: 'DELETE',
+      }),
+    }),
+    // Tags
+    getTags: builder.query<Models.Tag[], void>({
+      query: () => `tags`,
+    }),
+    createTag: builder.mutation<Models.Tag, Api.Tag.CreateTagRequest>({
+      query: (body) => ({
+        url: 'tags',
+        method: 'POST',
+        body,
+      }),
+    }),
   }),
 })
     
@@ -178,4 +213,12 @@ export const {
   useCreateTaskMutation,
   useUpdateTaskMutation,
   useDeleteTaskMutation,
+  // Projects - Tasks - Comments
+  useGetCommentsQuery,
+  useCreateCommentMutation,
+  useUpdateCommentMutation,
+  useDeleteCommentMutation,
+  // Tags
+  useGetTagsQuery,
+  useCreateTagMutation,
 } = api

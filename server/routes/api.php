@@ -8,6 +8,8 @@ use App\Http\Controllers\ForgotPasswordController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\TaskController;
+use App\Http\Controllers\CommentController;
+use App\Http\Controllers\TagController;
 
 /*
 |--------------------------------------------------------------------------
@@ -33,8 +35,14 @@ Route::middleware([ 'auth:sanctum' ])->group(function() {
     Route::post('/projects/{id}/avatar', [ProjectController::class, 'uploadAvatar']);
     Route::put('/projects/{id}', [ProjectController::class, 'updateProject']);
     Route::delete('/projects/{id}', [ProjectController::class, 'deleteProject']);
+    // ---------------------------- Tags
+    Route::get('/tags', [TagController::class, 'getAll']);
+    Route::post('/tags', [TagController::class, 'createTag']);
     // ---------------------------- Comments
-    
+    Route::get('/tasks/{id}/comments', [CommentController::class, 'getComments']);
+    Route::post('/tasks/{id}/comments', [CommentController::class, 'createComment']);
+    Route::put('/comments/{id}', [CommentController::class, 'updateComment']);
+    Route::delete('/comments/{id}', [CommentController::class, 'deleteComment']);
     // ---------------------------- Tasks
     Route::delete('/tasks/{id}', [TaskController::class, 'deleteTask']);
     Route::put('/tasks/{id}', [TaskController::class, 'updateTask']);
@@ -46,8 +54,8 @@ Route::middleware([ 'auth:sanctum' ])->group(function() {
     Route::put('/users/{id}', [UserController::class, 'updateProfile']);
     Route::put('/users/{id}/password', [UserController::class, 'updatePassword']);
     Route::post('/users/avatar', [UserController::class, 'uploadAvatar']);
-    // ----------------------------
     Route::get('/whoami', [AuthController::class, 'whoAmI']);
+    // ---------------------------- Auth
     Route::post('/sign-out', [AuthController::class, 'signOut']);
 });
 Route::get('/files/{filename}', [UserController::class, 'getFile']);

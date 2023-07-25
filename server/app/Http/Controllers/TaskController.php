@@ -8,7 +8,12 @@ use Illuminate\Http\Request;
 class TaskController extends Controller
 {
     public function getTask($id) {
-        return response()->json(Task::where('id', $id)->with('users', 'tasks')->first());
+        return response()
+            ->json(
+                Task::where('id', $id)
+                ->with('users', 'tasks', 'comments.user', 'comments.tags')
+                ->first()
+            );
     }
     public function createTask(Request $request) {
         $validated = $request->validate([
@@ -32,7 +37,7 @@ class TaskController extends Controller
         $validated = $request->validate([
             'name' => 'required',
             'description' => 'nullable',
-            'alias' => 'nullable|unique:tasks',
+            'alias' => 'nullable',
             'status' => 'required',
             'initial_date' => 'nullable',
             'final_date' => 'nullable',
@@ -41,6 +46,16 @@ class TaskController extends Controller
             'project_id' => 'required|exists:projects,id',
             'users_ids' => 'nullable|array|exists:users,id',
         ]);
+
+        if ($validated['alias'] != null) {
+            $taskByAlias = Task::where('alias', $validated['alias']);
+            if ($taskByAlias->count() > 0) {
+                $taskByAlias = $taskByAlias->first();
+                if ($taskByAlias->id != $id) {
+                    return response()->json([ 'message' => 'Alias already exists' ], 400);
+                }
+            }
+        }
 
         $task = Task::find($id);
         $task->update($validated);

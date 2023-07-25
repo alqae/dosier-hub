@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Comment;
 use App\Models\Project;
 use App\Models\User;
 use App\Models\Task;
@@ -15,7 +16,10 @@ class ProjectController extends Controller
         return response()->json(Project::all()->load('user'));
     }
     public function getProject($id) {
-        $tasks = Task::where('project_id', $id)->where('parent_task_id',null)->with('users', 'tasks')->get();
+        $tasks = Task::where('project_id', $id)
+            ->where('parent_task_id',null)
+            ->with('users', 'tasks', 'comments.user')
+            ->get();
         $project = Project::find($id)->with('user')->first();
         $project->tasks = $tasks;
         return response()->json($project);

@@ -1,8 +1,8 @@
 namespace Models {
   type BaseModel = {
     id: number
-    // created_at: string
-    // updated_at: string
+    created_at: string
+    updated_at: string
   }
 
   type User = BaseModel & {
@@ -41,6 +41,25 @@ namespace Models {
     users: Models.User[]
     users_ids: number[]
     tasks: Models.Task[]
+    comments: Models.Comment[]
+  }
+
+  type Tag = BaseModel & {
+    name: string
+    description: string
+  }
+
+  type Comment = BaseModel & {
+    title: string
+    comment: string
+    tags: Models.Tag[]
+    tags_ids: number[]
+    task: Models.Task
+    task_id: number
+    user: Models.User
+    user_id: number
+    parent_comment_id: number
+    comments: Models.Comment[]
   }
 }
 
@@ -102,7 +121,7 @@ namespace Api {
       initial_date: string
       final_date: string
     }
-
+    // Update Project
     namespace Task {
       type CreateTaskRequest = {
         name: string
@@ -116,6 +135,23 @@ namespace Api {
         parent_task_id: number | undefined
         project_id: number
       }
+    }
+    // Comments
+    namespace Comment {
+      type CreateCommentRequest = {
+        title: string
+        comment: string
+        tags_ids: number[]
+        task_id: number
+        parent_comment_id: number | undefined
+      }
+    }
+  }
+  // Tags
+  namespace Tag {
+    type CreateTagRequest = {
+      name: string
+      description: string
     }
   }
   // Users
