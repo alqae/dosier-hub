@@ -17,7 +17,9 @@ export const useAuthenticated = (): {
       .then<Models.User | undefined>(res => res.json())
       .then(res => {
         userLogged = res
-        dispatch(setUserLogged(res))
+        if (res) {
+          dispatch(setUserLogged({ ...res, is_admin: Boolean(res.is_admin) }))
+        }
       })
   }
   return {

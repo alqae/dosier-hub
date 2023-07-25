@@ -9,32 +9,33 @@ import Button from '@mui/joy/Button'
 import Modal from '@mui/joy/Modal'
 import Box from '@mui/joy/Box'
 
-import { useDeleteProjectMutation } from '@services/api'
+import { useDeleteTaskMutation } from '@services/api'
 
-interface IDeleteProjectModalProps {
+interface IDeleteTaskModalProps {
   children?: React.ReactNode
   onClose: () => void
   onDelete?: () => void
-  projectId?: number
+  taskId?: number
 }
 
-const DeleteProjectModal: React.FC<IDeleteProjectModalProps> = ({
-  projectId,
+const DeleteTaskModal: React.FC<IDeleteTaskModalProps> = ({
+  taskId,
   onClose,
-  onDelete
+  onDelete,
 }) => {
-  const [deleteProject] = useDeleteProjectMutation()
+  const [deleteTask] = useDeleteTaskMutation()
 
-  const onDeleteProject = async (projectId: number) => {
-    const response = await deleteProject(projectId)
+  const onDeleteTask = async () => {
+    const response = await deleteTask(taskId as number)
     if ('error' in response) return
-    if (onDelete) onDelete()
-    toast.success('Project deleted successfully')
+    toast.success('Task deleted successfully')
+    onClose()
+    onDelete?.()
   }
 
   return (
-    <Modal open={Boolean(projectId)} onClose={() => onClose()}>
-      <ModalDialog variant="outlined">
+    <Modal open={Boolean(taskId)} onClose={onClose}>
+      <ModalDialog variant="outlined" >
         <Typography
           id="alert-dialog-modal-title"
           component="h2"
@@ -44,14 +45,14 @@ const DeleteProjectModal: React.FC<IDeleteProjectModalProps> = ({
         </Typography>
         <Divider />
         <Typography id="alert-dialog-modal-description" textColor="text.tertiary">
-          Are you sure you want to delete this project?
+          Are you sure you want to delete this task?
         </Typography>
         <Box sx={{ display: 'flex', gap: 1, justifyContent: 'flex-end', pt: 2 }}>
           <Button variant="plain" color="neutral" onClick={() => onClose()}>
             Cancel
           </Button>
           <Button variant="solid" color="danger" onClick={() => {
-            onDeleteProject(projectId as number)
+            onDeleteTask()
             onClose()
           }}>
             Ok
@@ -62,4 +63,4 @@ const DeleteProjectModal: React.FC<IDeleteProjectModalProps> = ({
   )
 }
 
-export default DeleteProjectModal
+export default DeleteTaskModal

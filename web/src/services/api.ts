@@ -122,6 +122,30 @@ export const api = createApi({
         method: 'DELETE',
       }),
     }),
+    // Projects - Tasks
+    getTask: builder.query<Models.Task, number>({
+      query: (id) => `tasks/${id}`,
+    }),
+    createTask: builder.mutation<Models.Task, Api.Project.Task.CreateTaskRequest>({
+      query: (body) => ({
+        url: `projects/${body.project_id}/tasks`,
+        method: 'POST',
+        body,
+      }),
+    }),
+    updateTask: builder.mutation<Models.Task, Partial<Models.Task>>({
+      query: ({ id, ...body }) => ({
+        url: `tasks/${id}`,
+        method: 'PUT',
+        body,
+      }),
+    }),
+    deleteTask: builder.mutation<void, number>({
+      query: (id) => ({
+        url: `/tasks/${id}`,
+        method: 'DELETE',
+      }),
+    })
   }),
 })
     
@@ -148,4 +172,10 @@ export const {
   useCreateProjectMutation,
   useUpdateProjectMutation,
   useDeleteProjectMutation,
+  // Projects - Tasks
+  useGetTaskQuery,
+  useLazyGetTaskQuery,
+  useCreateTaskMutation,
+  useUpdateTaskMutation,
+  useDeleteTaskMutation,
 } = api

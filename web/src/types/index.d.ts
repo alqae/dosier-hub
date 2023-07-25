@@ -6,16 +6,15 @@ namespace Models {
   }
 
   type User = BaseModel & {
-    id: number
     name: string
     email: string
     avatar: string
     created_at: string
     updated_at: string
+    is_admin: boolean
   }
 
   type Project = BaseModel & {
-    id: number
     name: string
     description: string
     avatar: string
@@ -25,6 +24,23 @@ namespace Models {
     final_date: string
     user: Models.User // user id
     user_id: number
+    tasks: Models.Task[] // task id
+  }
+
+  type Task = BaseModel & {
+    name: string
+    description: string
+    alias: string
+    status: string
+    initial_date: string
+    final_date: string
+    time_spend: string
+    project: Models.Project
+    project_id: number
+    parent_task_id: number
+    users: Models.User[]
+    users_ids: number[]
+    tasks: Models.Task[]
   }
 }
 
@@ -85,6 +101,21 @@ namespace Api {
       status: string
       initial_date: string
       final_date: string
+    }
+
+    namespace Task {
+      type CreateTaskRequest = {
+        name: string
+        description: string | undefined
+        alias: string | undefined
+        status: TaskStatus
+        initial_date: string | undefined
+        final_date: string | undefined
+        time_spend: string | undefined
+        users_ids: number[]
+        parent_task_id: number | undefined
+        project_id: number
+      }
     }
   }
   // Users

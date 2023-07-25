@@ -57,7 +57,7 @@ const ProjectForm:React.FC<IProjectFormProps> = ({
   onSubmit,
   defaultValue,
 }) => {
-  const { data: users } = useGetUsersQuery()
+  const { data: users } = useGetUsersQuery(undefined, { refetchOnMountOrArgChange: true })
   const [avatar, setAvatar] = React.useState<File | undefined>(undefined)
   // const [status, setStatus] = React.useState<ProjectStatus>(ProjectStatus.Pending)
   const { handleSubmit, register, setValue, formState: { errors } } = useForm<IProjectForm>({
@@ -224,7 +224,9 @@ const ProjectForm:React.FC<IProjectFormProps> = ({
                 renderOption={(props, option) => (
                   <AutocompleteOption {...props} value={option.id}>
                     <ListItemDecorator>
-                      <Avatar src={getFileURL(option.avatar)}>{getInitials(option.name)}</Avatar>
+                      <Avatar src={getFileURL(option.avatar)}>
+                        {getInitials(option.name)}
+                      </Avatar>
                     </ListItemDecorator>
                     <ListItemContent sx={{ fontSize: 'sm' }}>
                       {option.name}

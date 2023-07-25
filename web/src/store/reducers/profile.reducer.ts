@@ -21,7 +21,11 @@ export const uploadAvatarUser = createAsyncThunk<void, File>(
     const data = await response.json()
     const state = getState() as RootState
     const userLogged = state.profile.userLogged as Models.User
-    dispatch(setUserLogged({ ...userLogged, avatar: data.success }))
+    dispatch(setUserLogged({
+      ...userLogged,
+      avatar: data.success,
+      is_admin: Boolean(userLogged.is_admin)
+    }))
     return
   }
 )

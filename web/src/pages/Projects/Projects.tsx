@@ -8,11 +8,13 @@ import ImageIcon from '@mui/icons-material/Image'
 import Typography from '@mui/joy/Typography'
 import IconButton from '@mui/joy/IconButton'
 import Avatar from '@mui/joy/Avatar'
+import Stack from '@mui/joy/Stack'
 import Table from '@mui/joy/Table'
 import Sheet from '@mui/joy/Sheet'
 import Link from '@mui/joy/Link'
 
 import DeleteProjectModal from '@components/DeleteProjectModal'
+import { useAuthenticated } from '@hooks/useAuthenticated'
 import { useGetProjectsQuery } from '@services/api'
 import { getFileURL, getInitials } from '@utils'
 
@@ -22,6 +24,7 @@ interface IProjectsProps {
 
 const Projects: React.FC<IProjectsProps> = () => {
   const navigate = useNavigate()
+  const { userLogged } = useAuthenticated()
   const { data: projects, isLoading, refetch } = useGetProjectsQuery(undefined, {
     refetchOnMountOrArgChange: true,
   })
@@ -72,8 +75,12 @@ const Projects: React.FC<IProjectsProps> = () => {
       >
         {isLoading ? <LinearProgress /> : (
           !projects?.length ? (
-            <Typography level="h2" mb={3}>
-              No projects found, <Link onClick={() => navigate('/projects/new')}>create one</Link>
+            <Typography
+              level="h2"
+              mb={3}
+              endDecorator={userLogged?.is_admin && <Link onClick={() => navigate('/projects/new')}>create one</Link>}
+            >
+              No projects found
             </Typography>
           ) : (
             <Table stickyHeader className={styles.table}>
@@ -86,7 +93,7 @@ const Projects: React.FC<IProjectsProps> = () => {
                   <th>Status</th>
                   <th>Initial Date</th>
                   <th>Final Date</th>
-                  <th>Actions</th>
+                  {userLogged?.is_admin && <th>Actions</th>}
                 </tr>
               </thead>
               <tbody>
@@ -112,33 +119,31 @@ const Projects: React.FC<IProjectsProps> = () => {
                     <td>{project.name}</td>
                     <td>{project.alias}</td>
                     <td>
-                      <Typography
-                        startDecorator={
-                          <Avatar
-                            src={getFileURL(project.user.avatar)}
-                            alt={project.name}
-                            size="sm"
-                          >
-                            {getInitials(project.user.name)}
-                          </Avatar>
-                        }
-                        sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1 }}
-                      >
-                        {project.user.name}
-                      </Typography>
+                      <Stack direction="row" alignItems="center" justifyContent="center" spacing={1}>
+                        <Avatar
+                          src={getFileURL(project.user.avatar)}
+                          alt={project.name}
+                          size="sm"
+                        >
+                          {getInitials(project.user.name)}
+                        </Avatar>
+                        <Typography>{project.user.name}</Typography>
+                      </Stack>
                     </td>
                     <td>{project.status}</td>
                     <td>{project.initial_date}</td>
                     <td>{project.final_date}</td>
-                    <td>
-                      <IconButton
-                        size="sm"
-                        variant="outlined"
-                        onClick={() => setProjectToDelete(project.id)}
-                      >
-                        <DeleteIcon />
-                      </IconButton>
-                    </td>
+                    {userLogged?.is_admin && (
+                      <td>
+                        <IconButton
+                          size="sm"
+                          variant="outlined"
+                          onClick={() => setProjectToDelete(project.id)}
+                        >
+                          <DeleteIcon />
+                        </IconButton>
+                      </td>
+                    )}
                   </tr>
                 ))}
               </tbody>

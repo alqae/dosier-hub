@@ -1,3 +1,9 @@
 ::-webkit-calendar-picker-indicator {
   filter: invert(1);
 }
+
+.MuiCard-root {
+  transition-property: transform;
+  transition-duration: 0.2s;
+  transition-timing-function: ease-in-out;
+}

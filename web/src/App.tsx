@@ -20,7 +20,6 @@ import Projects from '@pages/Projects'
 import Profile from '@pages/Profile'
 import SignUp from '@pages/SignUp'
 import SignIn from '@pages/SignIn'
-import Home from '@pages/Home'
 
 import AuthenticationLayout from '@components/AuthenticationLayout'
 import Layout from '@components/Layout'
@@ -35,7 +34,7 @@ const AuthenticatedRoute = () => {
 
 const router = createBrowserRouter(
   createRoutesFromElements(
-    <Route path="/" element={<Layout />}>
+    <Route path="/" element={<Layout />} errorElement={<Navigate to="/projects" />}>
       <Route path="auth" element={<AuthenticationLayout />}>
         <Route path="sign-up" element={<SignUp />} />
         <Route path="sign-in" element={<SignIn />} />
@@ -43,12 +42,12 @@ const router = createBrowserRouter(
       </Route>
 
       <Route path="/" element={<AuthenticatedRoute />}>
-        <Route path="/" element={<Home />}/>
         <Route path="profile" element={<Profile />}/>
         <Route path="projects" element={<Projects />}/>
         <Route path="projects/new" element={<CreateProject />}/>
         <Route path="projects/:projectId" element={<ProjectDetail />}/>
         <Route path="projects/:projectId/edit" element={<EditProject />}/>
+        <Route path="/" element={<Navigate to="/projects" />} />
       </Route>
     </Route>
   )

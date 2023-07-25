@@ -30,9 +30,9 @@ const Navbar: React.FC<INavbarProps> = () => {
   const { userLogged } = useAuthenticated()
   const dispatch = useAppDispatch()
   const navigate = useNavigate()
-  
-  const avatarURL = userLogged?.avatar ? getFileURL(userLogged?.avatar) : undefined
-  
+
+  const handleCloseMenu = () => setAnchorEl(null) // close menu
+
   return (
     <header>
       <Sheet
@@ -54,7 +54,7 @@ const Navbar: React.FC<INavbarProps> = () => {
         <IconButton
           size="sm"
           variant="soft"
-          onClick={() => navigate('/')}
+          onClick={() => navigate('/projects')}
           sx={{ px: 2, backgroundColor: 'white', borderRadius: 'lg' }}
         >
           <img alt="Logo" src={Logo} width={150} />
@@ -70,17 +70,21 @@ const Navbar: React.FC<INavbarProps> = () => {
             >
               All Projects
             </Button>
-            
-            <Button
-              onClick={() => navigate('/projects/new')}
-              startDecorator={<AddIcon />}
-              sx={{ borderRadius: 'xl', display: { xs: 'none', md: 'inline-flex' } }}
-            >
-              New Project
-            </Button>
+
+            {userLogged?.is_admin && (
+              <Button
+                onClick={() => navigate('/projects/new')}
+                startDecorator={<AddIcon />}
+                sx={{ borderRadius: 'xl', display: { xs: 'none', md: 'inline-flex' } }}
+              >
+                New Project
+              </Button>
+            )}
 
             <IconButton sx={{ borderRadius: 'xl' }} onClick={(event) => setAnchorEl(event.currentTarget)}>
-              <Avatar src={avatarURL} size="sm">{getInitials(userLogged?.name)}</Avatar>
+              <Avatar src={getFileURL(userLogged?.avatar)} size="sm">
+                {getInitials(userLogged?.name)}
+              </Avatar>
               <KeyboardArrowDownIcon />
             </IconButton>
 
@@ -101,8 +105,8 @@ const Navbar: React.FC<INavbarProps> = () => {
             >
               <MenuItem
                 onClick={() => {
+                  handleCloseMenu()
                   navigate('/profile')
-                  setAnchorEl(null) // close menu
                 }}
               >
                 <ListItemDecorator>
@@ -113,8 +117,8 @@ const Navbar: React.FC<INavbarProps> = () => {
               <ListDivider />
               <MenuItem
                 onClick={() => {
+                  handleCloseMenu()
                   dispatch(signOut())
-                  setAnchorEl(null) // close menu
                 }}
               >
                 <ListItemDecorator>

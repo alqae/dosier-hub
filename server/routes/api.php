@@ -7,6 +7,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ForgotPasswordController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ProjectController;
+use App\Http\Controllers\TaskController;
 
 /*
 |--------------------------------------------------------------------------
@@ -25,12 +26,20 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 // Protected routes
 Route::middleware([ 'auth:sanctum' ])->group(function() {
+    // ---------------------------- Projects
     Route::get('/projects', [ProjectController::class, 'getAll']);
     Route::get('/projects/{id}', [ProjectController::class, 'getProject']);
     Route::post('/projects', [ProjectController::class, 'createProject']);
     Route::post('/projects/{id}/avatar', [ProjectController::class, 'uploadAvatar']);
     Route::put('/projects/{id}', [ProjectController::class, 'updateProject']);
     Route::delete('/projects/{id}', [ProjectController::class, 'deleteProject']);
+    // ---------------------------- Comments
+    
+    // ---------------------------- Tasks
+    Route::delete('/tasks/{id}', [TaskController::class, 'deleteTask']);
+    Route::put('/tasks/{id}', [TaskController::class, 'updateTask']);
+    Route::get('/tasks/{id}', [TaskController::class, 'getTask']);
+    Route::post('/projects/{id}/tasks', [TaskController::class, 'createTask']);
     // ---------------------------- Users
     Route::get('/users', [UserController::class, 'getAll']);
     Route::get('/users/{id}', [UserController::class, 'getUser']);

@@ -12,26 +12,24 @@ import ListItemButton from '@mui/joy/ListItemButton'
 import DeleteIcon from '@mui/icons-material/Delete'
 import ListSubheader from '@mui/joy/ListSubheader'
 import EditIcon from '@mui/icons-material/Edit'
-import ModalDialog from '@mui/joy/ModalDialog'
-import FormControl from '@mui/joy/FormControl'
 import AspectRatio from '@mui/joy/AspectRatio'
 import AddIcon from '@mui/icons-material/Add'
 import { ColorPaletteProp } from '@mui/joy'
-import FormLabel from '@mui/joy/FormLabel'
 import ListItem from '@mui/joy/ListItem'
 import Avatar from '@mui/joy/Avatar'
 import Button from '@mui/joy/Button'
-import Input from '@mui/joy/Input'
 import Stack from '@mui/joy/Stack'
-import Modal from '@mui/joy/Modal'
 import Grid from '@mui/joy/Grid'
 import List from '@mui/joy/List'
 
 import DeleteProjectModal from '@components/DeleteProjectModal'
 import { ProjectStatus } from '@/types/project-status.enum'
+import { useAuthenticated } from '@hooks/useAuthenticated'
+import CreateTaskModal from '@components/CreateTaskModal'
 import { useGetProjectQuery } from '@services/api'
 import { getFileURL } from '@utils/getFileURL'
-import { getInitials } from '@/utils'
+import TaskCard from '@components/TaskCard'
+import { getInitials } from '@utils'
 
 interface IProjectDetailProps {
   children?: React.ReactNode
@@ -40,30 +38,31 @@ interface IProjectDetailProps {
 const ProjectDetail: React.FC<IProjectDetailProps> = () => {
   const [projectToDelete, setProjectToDelete] = useState<number | undefined>(undefined)
   const [showCreateTaskModal, setShowCreateTaskModal] = useState(false)
+  const { userLogged } = useAuthenticated()
   const { projectId } = useParams()
   const navigate = useNavigate()
 
-  const { data: project, isLoading } = useGetProjectQuery(Number(projectId), { skip: !projectId, refetchOnMountOrArgChange: true })
+  const { data: project, isLoading, refetch } = useGetProjectQuery(Number(projectId), { skip: !projectId, refetchOnMountOrArgChange: true })
 
   const statusColor = useMemo<OverridableStringUnion<ColorPaletteProp, TypographyPropsColorOverrides>>(
-      () => {
+    () => {
       switch (project?.status) {
         case ProjectStatus.Pending:
           return 'warning'
         case ProjectStatus.Active:
-          return 'success'
         case ProjectStatus.Completed:
-          return 'primary'
+          return 'success'
         default:
           return 'neutral'
       }
-    }, [project?.status]
+    },
+    [project?.status]
   )
 
   if (isLoading) {
     return (
       <AspectRatio variant="plain">
-        <CircularProgress/>
+        <CircularProgress />
       </AspectRatio>
     )
   }
@@ -95,46 +94,13 @@ const ProjectDetail: React.FC<IProjectDetailProps> = () => {
         onDelete={() => navigate('/projects')}
       />
 
-      <Modal open={showCreateTaskModal} onClose={() => setShowCreateTaskModal(false)}>
-        <ModalDialog
-          aria-labelledby="basic-modal-dialog-title"
-          aria-describedby="basic-modal-dialog-description"
-          sx={{ width: 500 }}
-        >
-          <Typography level="h4" fontWeight="bold">
-            Create new task
-          </Typography>
-          <Typography mb={2} textColor="text.tertiary">
-            Fill in the information of the task
-          </Typography>
-          <form
-            onSubmit={(event: React.FormEvent<HTMLFormElement>) => {
-              event.preventDefault()
-              setShowCreateTaskModal(false)
-            }}
-          >
-            <Stack spacing={2}>
-              <FormControl>
-                <FormLabel>Name</FormLabel>
-                <Input autoFocus required />
-              </FormControl>
-              <FormControl>
-                <FormLabel>Description</FormLabel>
-                <Input required />
-              </FormControl>
-
-              <Button type="submit">Create</Button>
-              <Button
-                variant="outlined"
-                color="neutral"
-                onClick={() => setShowCreateTaskModal(false)}
-              >
-                Cancel
-              </Button>
-            </Stack>
-          </form>
-        </ModalDialog>
-      </Modal>
+      <CreateTaskModal
+        projectId={showCreateTaskModal ? project.id : undefined}
+        onClose={() => {
+          setShowCreateTaskModal(false)
+          refetch()
+        }}
+      />
 
       <Grid container spacing={5} mt={5}>
         <Grid xs={8}>
@@ -147,10 +113,9 @@ const ProjectDetail: React.FC<IProjectDetailProps> = () => {
           </Button>
           <Typography level="h1" mb={3}>{project.name}</Typography>
 
-          <Typography level="h2" mb={1} fontWeight="bold">Description</Typography>
           <Typography mb={5}>{project.description}</Typography>
 
-          <Stack direction="row" justifyContent="space-between" alignItems="center">
+          <Stack direction="row" justifyContent="space-between" alignItems="center" mb={2}>
             <Typography level="h3" mb={1} fontWeight="bold">Tasks</Typography>
 
             <Button
@@ -162,12 +127,20 @@ const ProjectDetail: React.FC<IProjectDetailProps> = () => {
               Add Task
             </Button>
           </Stack>
+
+          {project.tasks?.map((task) => (
+            <TaskCard
+              {...task}
+              key={task.id}
+              onUpdated={() => refetch()}
+            />
+          ))}
         </Grid>
 
         <Grid xs={4}>
           <AspectRatio variant="plain" ratio="1/1">
             <Avatar
-              src={project ? getFileURL(project.avatar) : undefined}
+              src={getFileURL(project.avatar)}
               sx={{ width: '100%', height: 'auto' }}
             />
           </AspectRatio>
@@ -189,13 +162,14 @@ const ProjectDetail: React.FC<IProjectDetailProps> = () => {
               <ListSubheader><BadgeIcon sx={{ mr: 1 }} />Leader</ListSubheader>
               <List>
                 <ListItem>
-                  <Typography startDecorator={
+                  <Stack spacing={1} direction="row" alignItems="center">
                     <Avatar
-                      src={getFileURL(project.user?.avatar)}  
-                    >{getInitials(project.user?.name)}</Avatar>
-                  }>
-                    {project.user?.name}
-                  </Typography>
+                      src={getFileURL(project.user?.avatar)}
+                    >
+                      {getInitials(project.user?.name)}
+                    </Avatar>
+                    <Typography>{project.user?.name}</Typography>
+                  </Stack>
                 </ListItem>
               </List>
             </ListItem>
@@ -228,29 +202,33 @@ const ProjectDetail: React.FC<IProjectDetailProps> = () => {
             </ListItem>
           </List>
 
-          <Button
-            startDecorator={<EditIcon />}
-            variant="outlined"
-            color="warning"
-            sx={{ mt: 3 }}
-            size="md"
-            fullWidth
-            onClick={() => navigate(`/projects/${projectId}/edit`)}
-          >
-            Edit
-          </Button>
+          {userLogged?.is_admin && (
+            <>
+              <Button
+                startDecorator={<EditIcon />}
+                variant="outlined"
+                color="warning"
+                sx={{ mt: 3 }}
+                size="md"
+                fullWidth
+                onClick={() => navigate(`/projects/${projectId}/edit`)}
+              >
+                Edit
+              </Button>
 
-          <Button
-            startDecorator={<DeleteIcon />}
-            variant="outlined"
-            color="danger"
-            sx={{ mt: 1 }}
-            size="md"
-            fullWidth
-            onClick={() => setProjectToDelete(projectId ? Number(projectId) : undefined)}
-          >
-            Delete
-          </Button>
+              <Button
+                startDecorator={<DeleteIcon />}
+                variant="outlined"
+                color="danger"
+                sx={{ mt: 1 }}
+                size="md"
+                fullWidth
+                onClick={() => setProjectToDelete(projectId ? Number(projectId) : undefined)}
+              >
+                Delete
+              </Button>
+            </>
+          )}
         </Grid>
       </Grid>
     </>

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Project;
 use App\Models\User;
+use App\Models\Task;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
@@ -14,13 +15,20 @@ class ProjectController extends Controller
         return response()->json(Project::all()->load('user'));
     }
     public function getProject($id) {
-        return response()->json(Project::find($id)->load('user'));
+        $tasks = Task::where('project_id', $id)->where('parent_task_id',null)->with('users', 'tasks')->get();
+        $project = Project::find($id)->with('user')->first();
+        $project->tasks = $tasks;
+        return response()->json($project);
     }
     public function createProject(Request $request) {
+        /** @var User user */
+        $user = Auth::user();
+        if ($user->is_admin != 1) {
+            return response()->json([ 'message' => 'Unauthorized' ], 401);
+        }
         $validated = $request->validate([
             'name' => 'required',
             'description' => 'required',
-            // 'avatar' => 'required',
             'alias' => 'required|unique:projects',
             'status' => 'required',
             'initial_date' => 'required',
@@ -43,6 +51,11 @@ class ProjectController extends Controller
         return response()->json([ 'message' => 'File not found' ]);
     }
     public function updateProject(Request $request, $id) {
+        /** @var User user */
+        $user = Auth::user();
+        if ($user->is_admin != 1) {
+            return response()->json([ 'message' => 'Unauthorized' ], 401);
+        }
         $validated = $request->validate([
             'name' => 'required',
             'description' => 'required',
@@ -67,6 +80,11 @@ class ProjectController extends Controller
         return response()->json($project);
     }
     public function deleteProject($id) {
+        /** @var User user */
+        $user = Auth::user();
+        if ($user->is_admin != 1) {
+            return response()->json([ 'message' => 'Unauthorized' ], 401);
+        }
         $project = Project::find($id);
         $project->delete();
         return response()->json([ 'message' => 'Project deleted' ]);
