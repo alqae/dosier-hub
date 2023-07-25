@@ -1,11 +1,30 @@
 namespace Models {
-  type User = {
+  type BaseModel = {
+    id: number
+    // created_at: string
+    // updated_at: string
+  }
+
+  type User = BaseModel & {
     id: number
     name: string
     email: string
     avatar: string
     created_at: string
     updated_at: string
+  }
+
+  type Project = BaseModel & {
+    id: number
+    name: string
+    description: string
+    avatar: string
+    alias: string // unique
+    status: string
+    initial_date: string
+    final_date: string
+    user: Models.User // user id
+    user_id: number
   }
 }
 
@@ -28,22 +47,17 @@ namespace Api {
 
   // Authentication
   namespace Auth {
-    // Sign In
-    // type SignInResponse = {
-    //   user: Models.User
-    //   token: string
-    // }
     type AuthenticatedResponse = {
       user: Models.User
       token: string
     }
+    // Sign In
     type SignInRequest = {
       email: string
       password: string
     }
-    // Sign Up
-    // type SignUpResponse = SignInResponse
     type SignUpRequest = {
+    // Sign Up
       name: string
       email: string
       password: string
@@ -58,6 +72,19 @@ namespace Api {
     type ResetPasswordRequest = {
       token: string
       password: string
+    }
+  }
+  // Projects
+  namespace Project {
+    // Create Project
+    type CreateProjectRequest = {
+      name: string
+      description: string
+      // avatar: File
+      alias: string
+      status: string
+      initial_date: string
+      final_date: string
     }
   }
 }

@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown'
@@ -26,12 +26,12 @@ interface INavbarProps {
 }
 
 const Navbar: React.FC<INavbarProps> = () => {
-  const [anchorEl, setAnchorEl] = React.useState<HTMLElement | null>(null);
+  const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null)
   const { userLogged } = useAuthenticated()
   const dispatch = useAppDispatch()
   const navigate = useNavigate()
   
-  const avatarURL = getFileURL(userLogged?.avatar || '')
+  const avatarURL = userLogged?.avatar ? getFileURL(userLogged?.avatar) : undefined
   
   return (
     <header>
@@ -72,6 +72,7 @@ const Navbar: React.FC<INavbarProps> = () => {
             </Button>
             
             <Button
+              onClick={() => navigate('/projects/new')}
               startDecorator={<AddIcon />}
               sx={{ borderRadius: 'xl', display: { xs: 'none', md: 'inline-flex' } }}
             >
@@ -98,14 +99,24 @@ const Navbar: React.FC<INavbarProps> = () => {
                 minWidth: 200,
               }}
             >
-              <MenuItem onClick={() => navigate('/profile')}>
+              <MenuItem
+                onClick={() => {
+                  navigate('/profile')
+                  setAnchorEl(null) // close menu
+                }}
+              >
                 <ListItemDecorator>
                   <PersonIcon />
                 </ListItemDecorator>
                 Profile
               </MenuItem>
               <ListDivider />
-              <MenuItem onClick={() => dispatch(signOut())}>
+              <MenuItem
+                onClick={() => {
+                  dispatch(signOut())
+                  setAnchorEl(null) // close menu
+                }}
+              >
                 <ListItemDecorator>
                   <LogoutIcon />
                 </ListItemDecorator>

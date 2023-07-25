@@ -1,0 +1,13 @@
+.container {
+  width: 100%;
+  padding-right: $container-padding-x;
+  padding-left: $container-padding-x;
+  margin-right: auto;
+  margin-left: auto;
+
+  @each $breakpoint, $container-max-width in $container-max-widths {
+    @media (min-width: $container-max-width) {
+      max-width: $container-max-width;
+    }
+  }
+}

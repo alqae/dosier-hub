@@ -1,9 +1,11 @@
 import React from 'react'
-import { Outlet } from 'react-router-dom'
+import { Outlet, useLocation } from 'react-router-dom'
+
+import Box from '@mui/joy/Box'
 
 import { useAuthenticated } from '@hooks/useAuthenticated'
-import Navbar from '../Navbar'
 import Footer from '../Footer'
+import Navbar from '../Navbar'
 
 interface ILayoutProps {
   children?: React.ReactNode
@@ -11,11 +13,16 @@ interface ILayoutProps {
 
 const Layout:React.FC<ILayoutProps> = () => {
   const { isAuthenticated } = useAuthenticated()
+  const location = useLocation()
+  const isLogin = location.pathname.includes('auth')
+
   return (
     <>
       {isAuthenticated && <Navbar />}
       <main>
-        <Outlet />
+        <Box sx={{ py: isLogin ? 0 : 4 }} className={isLogin ? '' : 'container'}>
+          <Outlet />
+        </Box>
       </main>
       {isAuthenticated && <Footer />}
     </>

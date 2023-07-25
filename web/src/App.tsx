@@ -13,6 +13,8 @@ import theme from '@config/theme'
 
 import ForgotPassword from '@pages/ForgotPassword'
 import ProjectDetail from '@pages/ProjectDetail'
+import CreateProject from '@pages/CreateProject'
+import EditProject from '@pages/EditProject'
 import Projects from '@pages/Projects'
 import Profile from '@pages/Profile'
 import SignUp from '@pages/SignUp'
@@ -42,7 +44,9 @@ const router = createBrowserRouter(
         <Route path="/" element={<Home />}/>
         <Route path="profile" element={<Profile />}/>
         <Route path="projects" element={<Projects />}/>
+        <Route path="projects/new" element={<CreateProject />}/>
         <Route path="projects/:projectId" element={<ProjectDetail />}/>
+        <Route path="projects/:projectId/edit" element={<EditProject />}/>
       </Route>
     </Route>
   )

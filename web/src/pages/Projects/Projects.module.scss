@@ -1,0 +1,20 @@
+.table {
+  tr {
+    &:not(:has(th)):hover {
+      cursor: pointer;
+      background-color: var(--ds-palette-neutral-plainActiveBg);
+    }
+    
+    th, td {
+      text-align: center;
+      vertical-align: middle;
+  
+      img {
+        width: 35px;
+        height: 35px;
+        border-radius: 50%;
+        vertical-align: middle;
+      }
+    }
+  }
+}

@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ForgotPasswordController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\ProjectController;
 
 /*
 |--------------------------------------------------------------------------
@@ -24,8 +25,20 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 // Protected routes
 Route::middleware([ 'auth:sanctum' ])->group(function() {
-    Route::get('/whoami', [AuthController::class, 'whoAmI']);
+    Route::get('/projects', [ProjectController::class, 'getAll']);
+    Route::get('/projects/{id}', [ProjectController::class, 'getProject']);
+    Route::post('/projects', [ProjectController::class, 'createProject']);
+    Route::post('/projects/{id}/avatar', [ProjectController::class, 'uploadAvatar']);
+    Route::put('/projects/{id}', [ProjectController::class, 'updateProject']);
+    Route::delete('/projects/{id}', [ProjectController::class, 'deleteProject']);
+    // ---------------------------- Users
+    Route::get('/users', [UserController::class, 'getAll']);
+    Route::get('/users/{id}', [UserController::class, 'getUser']);
+    Route::put('/users/{id}', [UserController::class, 'updateUser']);
+    Route::put('/users/{id}/password', [UserController::class, 'updatePassword']);
     Route::post('/users/avatar', [UserController::class, 'uploadAvatar']);
+    // ----------------------------
+    Route::get('/whoami', [AuthController::class, 'whoAmI']);
     Route::post('/sign-out', [AuthController::class, 'signOut']);
 });
 Route::get('/files/{filename}', [UserController::class, 'getFile']);

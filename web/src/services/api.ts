@@ -65,7 +65,10 @@ export const api = createApi({
       }),
     }),
     // Users
-    uploadAvatar: builder.mutation<Api.Response<Models.User>, FormData>({
+    getUsers: builder.query<Models.User[], void>({
+      query: () => `users`,
+    }),
+    uploadAvatar: builder.mutation<{ success: string }, FormData>({
       query: (body) => ({
         url: 'users/avatar',
         method: 'POST',
@@ -73,6 +76,33 @@ export const api = createApi({
         headers: {
           'Content-Type': 'multipart/form-data',
         },
+      }),
+    }),
+    // Projects
+    getProjects: builder.query<Models.Project[], void>({
+      query: () => `projects`,
+    }),
+    getProject: builder.query<Models.Project, number>({
+      query: (id) => `projects/${id}`,
+    }),
+    createProject: builder.mutation<Models.Project, Api.Project.CreateProjectRequest>({
+      query: (body) => ({
+        url: 'projects',
+        method: 'POST',
+        body,
+      }),
+    }),
+    updateProject: builder.mutation<Models.Project, Partial<Models.Project>>({
+      query: ({ id, ...body }) => ({
+        url: `projects/${id}`,
+        method: 'PUT',
+        body,
+      }),
+    }),
+    deleteProject: builder.mutation<void, number>({
+      query: (id) => ({
+        url: `projects/${id}`,
+        method: 'DELETE',
       }),
     }),
   }),
@@ -90,5 +120,12 @@ export const {
   useForgotPasswordMutation,
   useResetPasswordMutation,
   // Users
+  useGetUsersQuery,
   useUploadAvatarMutation,
+  // Projects
+  useGetProjectsQuery,
+  useGetProjectQuery,
+  useCreateProjectMutation,
+  useUpdateProjectMutation,
+  useDeleteProjectMutation,
 } = api

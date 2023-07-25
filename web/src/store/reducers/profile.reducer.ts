@@ -8,7 +8,7 @@ interface ProfileState {
 const initialState: ProfileState = {
 }
 
-export const uploadAvatar = createAsyncThunk<void, File>(
+export const uploadAvatarUser = createAsyncThunk<void, File>(
   'profile/uploadAvatar',
   async (file, { dispatch, getState }) => {
     const apiURL = import.meta.env.API_URL || 'http://localhost:8000'
@@ -25,7 +25,6 @@ export const uploadAvatar = createAsyncThunk<void, File>(
     return
   }
 )
-
 
 const ProfileSlice = createSlice({
   name: 'profile',

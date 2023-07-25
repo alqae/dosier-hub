@@ -1,0 +1,14 @@
+// Global styles
+body, #root, .MuiScopedCssBaseline-root {
+  min-height: 100vh;
+}
+
+.MuiScopedCssBaseline-root {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+main {
+  flex: 1;
+}
