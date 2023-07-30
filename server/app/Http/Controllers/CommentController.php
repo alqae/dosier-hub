@@ -16,17 +16,16 @@ class CommentController extends Controller
         $validated = $request->validate([
             'title' => 'required',
             'comment' => 'required',
-            'tags' => 'nullable|array|exists:tags,id',
-            'parent_comment_id' => 'nullable|exists:comments,id',
-            // 'user_id' => 'required|exists:users,id',
             'task_id' => 'required|exists:tasks,id',
+            'tags_ids' => 'nullable|array|exists:tags,id',
+            'parent_comment_id' => 'nullable|exists:comments,id',
         ]);
 
         /** @var User user */
         $user = Auth::user();
         $validated['user_id'] = $user->id;
-
-        $comment = comment::create($validated);
+        $comment = Comment::create($validated);
+        $comment->tags()->attach($validated['tags_ids']);
         return response()->json($comment);  
     }
     public function updateComment($id, Request $request) {
@@ -48,6 +47,7 @@ class CommentController extends Controller
             return response()->json([ 'message' => 'Unauthorized' ], 401);
         }
 
+        $comment->tags()->sync($validated['tags_ids']);
         $comment->update($validated);
         return response()->json($comment);
     }

@@ -24,6 +24,7 @@ return new class extends Migration
             $table->date('initial_date')->nullable();
             $table->date('final_date')->nullable();
             $table->string('time_spend')->nullable();
+            $table->timestamp('deleted_at')->nullable(true);
             $table->timestamps();
         });
     }

@@ -7,7 +7,7 @@ import Typography from '@mui/joy/Typography'
 import Button from '@mui/joy/Button'
 
 import { useGetProjectQuery, useUpdateProjectMutation } from '@services/api'
-import ProjectForm, { IProjectForm } from '@components/ProjectForm'
+import ProjectForm, { type IProjectForm } from '@components/ProjectForm'
 import { useAppDispatch, uploadAvatarProject } from '@store'
 
 interface IEditProjectProps {

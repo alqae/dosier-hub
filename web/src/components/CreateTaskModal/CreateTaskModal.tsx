@@ -6,8 +6,8 @@ import ModalDialog from '@mui/joy/ModalDialog'
 import Typography from '@mui/joy/Typography'
 import Modal from '@mui/joy/Modal'
 
+import TaskForm, { type ITaskForm } from '../TaskForm'
 import { useCreateTaskMutation } from '@services/api'
-import TaskForm, { ITaskForm } from '../TaskForm'
 
 interface ICreateTaskModalProps {
   children?: React.ReactNode

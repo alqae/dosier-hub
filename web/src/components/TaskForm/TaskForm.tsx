@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react'
-import * as Yup from 'yup'
-import { useForm } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
+import { useForm } from 'react-hook-form'
+import * as Yup from 'yup'
 
 import AutocompleteOption from '@mui/joy/AutocompleteOption'
 import ListItemDecorator from '@mui/joy/ListItemDecorator'
@@ -59,7 +59,13 @@ const TaskForm: React.FC<ITaskFormProps> = ({
 }) => {
   const { data: users } = useGetUsersQuery(undefined, { refetchOnMountOrArgChange: true })
 
-  const { handleSubmit, register, setValue, reset, formState: { errors } } = useForm<ITaskForm>({
+  const {
+    reset,
+    register,
+    setValue,
+    handleSubmit,
+    formState: { errors }
+  } = useForm<ITaskForm>({
     defaultValues: {
       name: '',
       description: '',
@@ -80,7 +86,7 @@ const TaskForm: React.FC<ITaskFormProps> = ({
     if (newValue) setValue('status', newValue as TaskStatus)
   }
 
-  const onSave = (values: ITaskForm) => {
+  const _onSubmit = (values: ITaskForm) => {
     onSubmit(values)
     reset()
   }
@@ -99,7 +105,7 @@ const TaskForm: React.FC<ITaskFormProps> = ({
   }, [defaultValue])
 
   return (
-    <form onSubmit={handleSubmit(onSave)}>
+    <form onSubmit={handleSubmit(_onSubmit)}>
       <Stack spacing={2}>
         <FormControl>
           <FormLabel>Name</FormLabel>

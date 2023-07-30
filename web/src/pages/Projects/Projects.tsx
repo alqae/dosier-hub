@@ -14,9 +14,11 @@ import Sheet from '@mui/joy/Sheet'
 import Link from '@mui/joy/Link'
 
 import DeleteProjectModal from '@components/DeleteProjectModal'
+import { ProjectStatus } from '@/types/project-status.enum'
 import { useAuthenticated } from '@hooks/useAuthenticated'
+import { getFileURL, getInitials, timeAgo } from '@utils'
 import { useGetProjectsQuery } from '@services/api'
-import { getFileURL, getInitials } from '@utils'
+import StatusBadge from '@components/StatusBadge'
 
 interface IProjectsProps {
   children?: React.ReactNode
@@ -29,12 +31,13 @@ const Projects: React.FC<IProjectsProps> = () => {
     refetchOnMountOrArgChange: true,
   })
   const [projectToDelete, setProjectToDelete] = useState<number | undefined>(undefined)
-
+  
   return (
     <>
       <DeleteProjectModal
-        projectId={projectToDelete}
         onClose={() => setProjectToDelete(undefined)}
+        hasTasks={Boolean(projects?.find((project) => project.id === projectToDelete)?.tasks_count)}
+        projectId={projectToDelete}
         onDelete={refetch}
       />
 
@@ -130,9 +133,9 @@ const Projects: React.FC<IProjectsProps> = () => {
                         <Typography>{project.user.name}</Typography>
                       </Stack>
                     </td>
-                    <td>{project.status}</td>
-                    <td>{project.initial_date}</td>
-                    <td>{project.final_date}</td>
+                    <td><StatusBadge status={project.status as ProjectStatus} /></td>
+                    <td>{timeAgo(project.initial_date)}</td>
+                    <td>{timeAgo(project.final_date)}</td>
                     {userLogged?.is_admin && (
                       <td>
                         <IconButton

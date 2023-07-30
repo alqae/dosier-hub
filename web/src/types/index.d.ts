@@ -25,6 +25,7 @@ namespace Models {
     user: Models.User // user id
     user_id: number
     tasks: Models.Task[] // task id
+    tasks_count?: number
   }
 
   type Task = BaseModel & {

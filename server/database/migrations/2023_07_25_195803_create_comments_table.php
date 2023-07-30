@@ -19,6 +19,9 @@ return new class extends Migration
             $table->foreign('task_id')->references('id')->on('tasks')->after('user_id');
             $table->string('title')->nullable(false);
             $table->text('comment')->nullable(false);
+            $table->unsignedBigInteger('parent_comment_id')->nullable(true);
+            $table->foreign('parent_comment_id')->references('id')->on('comments')->after('comment');
+            $table->timestamp('deleted_at')->nullable(true);
             $table->timestamps();
         });
     }

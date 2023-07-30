@@ -18,10 +18,11 @@ return new class extends Migration
             $table->string('avatar')->nullable();
             $table->string('alias')->unique();
             $table->string('status');
-            $table->string('initial_date');
-            $table->string('final_date');
+            $table->timestamp('initial_date');
+            $table->timestamp('final_date');
             $table->bigInteger('user_id')->unsigned();
             $table->foreign('user_id')->references('id')->on('users')->after('name');
+            $table->timestamp('deleted_at')->nullable(true);
             $table->timestamps();
         });
     }

@@ -3,17 +3,22 @@
 namespace App\Http\Controllers;
 
 use App\Models\Task;
+use App\Models\Comment;
 use Illuminate\Http\Request;
 
 class TaskController extends Controller
 {
     public function getTask($id) {
-        return response()
-            ->json(
-                Task::where('id', $id)
-                ->with('users', 'tasks', 'comments.user', 'comments.tags')
-                ->first()
-            );
+        $comments = Comment::where('task_id', $id)
+            ->where('parent_comment_id', null)
+            ->orderBy('created_at', 'DESC')
+            ->with('comments', 'tags', 'user')
+            ->get();
+        $task = Task::where('id', $id)
+            ->with('users', 'tasks')
+            ->first();
+        $task->comments = $comments;
+        return response()->json($task);
     }
     public function createTask(Request $request) {
         $validated = $request->validate([

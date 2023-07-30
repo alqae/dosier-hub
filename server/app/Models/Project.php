@@ -3,11 +3,16 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Dyrynda\Database\Support\CascadeSoftDeletes;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Model;
 
 class Project extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes, CascadeSoftDeletes;
+
+    protected $cascadeDeletes = ['tasks'];
+    protected $dates = ['deleted_at'];
 
     protected $fillable = [
         'name',
@@ -28,5 +33,9 @@ class Project extends Model
     public function tasks()
     {
         return $this->hasMany(Task::class, 'project_id', 'id');
+    }
+
+    public function totalTasks() {
+        return $this->hasMany(Task::class, 'project_id', 'id')->count();
     }
 }

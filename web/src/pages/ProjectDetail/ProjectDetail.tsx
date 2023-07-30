@@ -1,12 +1,10 @@
-import React, { useMemo, useState } from 'react'
+import React, { useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 
-import Typography, { TypographyPropsColorOverrides } from '@mui/joy/Typography'
 import CircularProgress from '@mui/material/CircularProgress'
 import CalendarIcon from '@mui/icons-material/CalendarMonth'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 import SearchOffIcon from '@mui/icons-material/SearchOff'
-import type { OverridableStringUnion } from '@mui/types'
 import BadgeIcon from '@mui/icons-material/BadgeSharp'
 import ListItemButton from '@mui/joy/ListItemButton'
 import DeleteIcon from '@mui/icons-material/Delete'
@@ -14,7 +12,7 @@ import ListSubheader from '@mui/joy/ListSubheader'
 import EditIcon from '@mui/icons-material/Edit'
 import AspectRatio from '@mui/joy/AspectRatio'
 import AddIcon from '@mui/icons-material/Add'
-import { ColorPaletteProp } from '@mui/joy'
+import Typography from '@mui/joy/Typography'
 import ListItem from '@mui/joy/ListItem'
 import Avatar from '@mui/joy/Avatar'
 import Button from '@mui/joy/Button'
@@ -27,9 +25,10 @@ import { ProjectStatus } from '@/types/project-status.enum'
 import { useAuthenticated } from '@hooks/useAuthenticated'
 import CreateTaskModal from '@components/CreateTaskModal'
 import { useGetProjectQuery } from '@services/api'
+import StatusBadge from '@components/StatusBadge'
 import { getFileURL } from '@utils/getFileURL'
+import { getInitials, timeAgo } from '@utils'
 import TaskCard from '@components/TaskCard'
-import { getInitials } from '@utils'
 
 interface IProjectDetailProps {
   children?: React.ReactNode
@@ -42,21 +41,9 @@ const ProjectDetail: React.FC<IProjectDetailProps> = () => {
   const { projectId } = useParams()
   const navigate = useNavigate()
 
-  const { data: project, isLoading, refetch } = useGetProjectQuery(Number(projectId), { skip: !projectId, refetchOnMountOrArgChange: true })
-
-  const statusColor = useMemo<OverridableStringUnion<ColorPaletteProp, TypographyPropsColorOverrides>>(
-    () => {
-      switch (project?.status) {
-        case ProjectStatus.Pending:
-          return 'warning'
-        case ProjectStatus.Active:
-        case ProjectStatus.Completed:
-          return 'success'
-        default:
-          return 'neutral'
-      }
-    },
-    [project?.status]
+  const { data: project, isLoading, refetch } = useGetProjectQuery(
+    Number(projectId),
+    { skip: !projectId, refetchOnMountOrArgChange: true, refetchOnFocus: true }
   )
 
   if (isLoading) {
@@ -90,8 +77,9 @@ const ProjectDetail: React.FC<IProjectDetailProps> = () => {
     <>
       <DeleteProjectModal
         projectId={projectToDelete}
-        onClose={() => setProjectToDelete(undefined)}
+        hasTasks={Boolean(project.tasks?.length)}
         onDelete={() => navigate('/projects')}
+        onClose={() => setProjectToDelete(undefined)}
       />
 
       <CreateTaskModal
@@ -145,9 +133,10 @@ const ProjectDetail: React.FC<IProjectDetailProps> = () => {
             />
           </AspectRatio>
 
-          <Typography variant="outlined" display="inline-block" color={statusColor} mb={1} mx={0}>
-            {project.status}
-          </Typography>
+          <StatusBadge
+            status={project.status as ProjectStatus}
+            sx={{mb: 1, mx: 0 }}
+          />
 
           <List
             variant="outlined"
@@ -187,7 +176,7 @@ const ProjectDetail: React.FC<IProjectDetailProps> = () => {
               <ListSubheader><CalendarIcon sx={{ mr: 1 }} />Initial Date</ListSubheader>
               <List>
                 <ListItem>
-                  <ListItemButton>{project.initial_date}</ListItemButton>
+                  <ListItemButton>{timeAgo(project.initial_date)}</ListItemButton>
                 </ListItem>
               </List>
             </ListItem>
@@ -196,7 +185,7 @@ const ProjectDetail: React.FC<IProjectDetailProps> = () => {
               <ListSubheader><CalendarIcon sx={{ mr: 1 }} />Final Date</ListSubheader>
               <List>
                 <ListItem>
-                  <ListItemButton>{project.final_date}</ListItemButton>
+                  <ListItemButton>{timeAgo(project.final_date)}</ListItemButton>
                 </ListItem>
               </List>
             </ListItem>

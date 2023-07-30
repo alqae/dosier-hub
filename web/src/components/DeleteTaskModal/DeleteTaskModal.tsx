@@ -15,13 +15,15 @@ interface IDeleteTaskModalProps {
   children?: React.ReactNode
   onClose: () => void
   onDelete?: () => void
+  hasSubtasks?: boolean
   taskId?: number
 }
 
 const DeleteTaskModal: React.FC<IDeleteTaskModalProps> = ({
   taskId,
   onClose,
-  onDelete,
+  hasSubtasks = false,
+  onDelete = () => { },
 }) => {
   const [deleteTask] = useDeleteTaskMutation()
 
@@ -30,22 +32,28 @@ const DeleteTaskModal: React.FC<IDeleteTaskModalProps> = ({
     if ('error' in response) return
     toast.success('Task deleted successfully')
     onClose()
-    onDelete?.()
+    onDelete()
   }
 
   return (
     <Modal open={Boolean(taskId)} onClose={onClose}>
-      <ModalDialog variant="outlined" >
+      <ModalDialog variant="outlined"  sx={{ width: 400 }}>
         <Typography
-          id="alert-dialog-modal-title"
+          pb={2}
           component="h2"
           startDecorator={<WarningRoundedIcon />}
         >
           Confirm
         </Typography>
         <Divider />
-        <Typography id="alert-dialog-modal-description" textColor="text.tertiary">
-          Are you sure you want to delete this task?
+        <Typography textColor="text.tertiary" pt={2}>
+          Are you sure you want to delete this task?<br />
+          {hasSubtasks && (
+            <>
+              <Typography display="inline-block" mt={2} component="b" fontWeight="bold">NOTE: </Typography>
+              &nbsp;This task has <Typography display="inline-block" component="b" fontWeight="bold">subtasks</Typography> and will be deleted too
+            </>
+          )}
         </Typography>
         <Box sx={{ display: 'flex', gap: 1, justifyContent: 'flex-end', pt: 2 }}>
           <Button variant="plain" color="neutral" onClick={() => onClose()}>

@@ -21,9 +21,9 @@ import Input from '@mui/joy/Input'
 import Grid from '@mui/joy/Grid'
 import Box from '@mui/joy/Box'
 
+import { fromSqlTimestampToString, getFileURL, getInitials } from '@utils'
 import { ProjectStatus } from '@/types/project-status.enum'
 import { useGetUsersQuery } from '@services/api'
-import { getFileURL, getInitials } from '@utils'
 
 interface IProjectFormProps {
   children?: React.ReactNode
@@ -85,8 +85,8 @@ const ProjectForm:React.FC<IProjectFormProps> = ({
       setValue('description', defaultValue.description)
       setValue('alias', defaultValue.alias)
       setValue('status', defaultValue.status)
-      setValue('initial_date', defaultValue.initial_date)
-      setValue('final_date', defaultValue.final_date)
+      setValue('initial_date', fromSqlTimestampToString(defaultValue.initial_date))
+      setValue('final_date', fromSqlTimestampToString(defaultValue.final_date))
       setValue('user_id', defaultValue.user_id)
     }
   }, [defaultValue])

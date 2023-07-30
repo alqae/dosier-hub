@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Comment;
 use App\Models\Project;
 use App\Models\User;
 use App\Models\Task;
@@ -13,14 +12,17 @@ use Illuminate\Support\Str;
 class ProjectController extends Controller
 {
     public function getAll() {
-        return response()->json(Project::all()->load('user'));
+        return response()->json(Project::all()->load('user')->loadCount('tasks'));
     }
     public function getProject($id) {
+        $project = Project::where('id', $id)->with('user')->first();
+        if ($project == null) {
+            return response()->json([ 'message' => 'Project not found' ], 404);
+        }
         $tasks = Task::where('project_id', $id)
             ->where('parent_task_id',null)
-            ->with('users', 'tasks', 'comments.user')
+            ->with('users', 'tasks')
             ->get();
-        $project = Project::find($id)->with('user')->first();
         $project->tasks = $tasks;
         return response()->json($project);
     }
