@@ -8,24 +8,27 @@ interface ProfileState {
 const initialState: ProfileState = {
 }
 
-export const uploadAvatarUser = createAsyncThunk<void, File>(
+export const uploadAvatarUser = createAsyncThunk<void, [number | undefined, File]>(
   'profile/uploadAvatar',
-  async (file, { dispatch, getState }) => {
+  async ([id, file], { dispatch, getState }) => {
     const apiURL = import.meta.env.API_URL || 'http://localhost:8000'
     const body = new FormData()
     body.append('avatar', file, file.name)
     const headers = new Headers()
     headers.set('Accept', 'application/json') // This is important to work with Laravel
     headers.set('Authorization', `Bearer ${localStorage.getItem('token')}`)
-    const response = await fetch(`${apiURL}/api/users/avatar`, { headers, method: 'POST', body })
-    const data = await response.json()
-    const state = getState() as RootState
-    const userLogged = state.profile.userLogged as Models.User
-    dispatch(setUserLogged({
-      ...userLogged,
-      avatar: data.success,
-      is_admin: Boolean(userLogged.is_admin)
-    }))
+    const url = `${apiURL}/api/users${id ? `/${id}` : ''}/avatar`
+    const response = await fetch(url, { headers, method: 'POST', body })
+    if (!id) {
+      const data = await response.json()
+      const state = getState() as RootState
+      const userLogged = state.profile.userLogged as Models.User
+      dispatch(setUserLogged({
+        ...userLogged,
+        avatar: data.success,
+        is_admin: Boolean(userLogged.is_admin)
+      }))
+    }
     return
   }
 )

@@ -1,29 +1,34 @@
+import { useEffect } from 'react'
 import { useSelector } from 'react-redux'
 
 import { RootState, setUserLogged, useAppDispatch } from '@store'
+import { useLazyGetUserLoggedQuery } from '@/services/api'
 
 export const useAuthenticated = (): {
   isAuthenticated: boolean
   userLogged?: Models.User
 } => {
+  const [trigger, { data }] = useLazyGetUserLoggedQuery()
   const token = useSelector<RootState, RootState['auth']['token']>((state) => state.auth.token)
-  var userLogged = useSelector<RootState, Models.User | undefined>((state) => state.profile.userLogged)
+  const userLogged = useSelector<RootState, Models.User | undefined>((state) => state.profile.userLogged)
   const dispatch = useAppDispatch()
-  if (!userLogged && token) {
-    const apiURL = import.meta.env.API_URL || 'http://localhost:8000'
-    const headers = new Headers()
-    headers.set('Authorization', `Bearer ${token}`)
-    fetch(`${apiURL}/api/whoami`, { headers })
-      .then<Models.User | undefined>(res => res.json())
-      .then(res => {
-        userLogged = res
-        if (res) {
-          dispatch(setUserLogged({ ...res, is_admin: Boolean(res.is_admin) }))
-        }
-      })
-  }
+  useEffect(() => {
+    if (!userLogged) {
+      trigger()
+    }
+  }, [trigger, userLogged])
+
+  useEffect(() => {
+    if (data) {
+      dispatch(setUserLogged({
+        ...data,
+        is_admin: Boolean(data.is_admin)
+      }))
+    }
+  }, [data])
+
   return {
-    isAuthenticated: !!token,
+    isAuthenticated: Boolean(token),
     userLogged,
   }
 }

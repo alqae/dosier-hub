@@ -50,10 +50,13 @@ Route::middleware([ 'auth:sanctum' ])->group(function() {
     Route::post('/projects/{id}/tasks', [TaskController::class, 'createTask']);
     // ---------------------------- Users
     Route::get('/users', [UserController::class, 'getAll']);
+    Route::post('/users/invite', [UserController::class, 'inviteUser']);
     Route::get('/users/{id}', [UserController::class, 'getUser']);
     Route::put('/users/{id}', [UserController::class, 'updateProfile']);
     Route::put('/users/{id}/password', [UserController::class, 'updatePassword']);
     Route::post('/users/avatar', [UserController::class, 'uploadAvatar']);
+    Route::post('/users/{id}/avatar', [UserController::class, 'uploadAvatarById']);
+    Route::delete('/users/{id}', [UserController::class, 'deleteUser']);
     Route::get('/whoami', [AuthController::class, 'whoAmI']);
     // ---------------------------- Auth
     Route::post('/sign-out', [AuthController::class, 'signOut']);

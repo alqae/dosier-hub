@@ -1,53 +1,47 @@
-import React, { useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 
 import LinearProgress from '@mui/joy/LinearProgress'
 import DeleteIcon from '@mui/icons-material/Delete'
-import ImageIcon from '@mui/icons-material/Image'
+import PersonIcon from '@mui/icons-material/Person'
+import EditIcon from '@mui/icons-material/Edit'
 import AddIcon from '@mui/icons-material/Add'
-import Typography from '@mui/joy/Typography'
 import IconButton from '@mui/joy/IconButton'
+import Typography from '@mui/joy/Typography'
 import Avatar from '@mui/joy/Avatar'
 import Button from '@mui/joy/Button'
 import Table from '@mui/joy/Table'
 import Stack from '@mui/joy/Stack'
 import Card from '@mui/joy/Card'
 
-import DeleteProjectModal from '@components/DeleteProjectModal'
-import { ProjectStatus } from '@/types/project-status.enum'
 import { useAuthenticated } from '@hooks/useAuthenticated'
-import { useGetProjectsQuery } from '@services/api'
+import { useGetUsersPaginatedQuery } from '@services/api'
+import InviteUserModal from '@components/InviteUserModal'
+import DeleteUserModal from '@components/DeleteUserModal'
 import { usePaginate } from '@hooks/usePaginate'
-import StatusBadge from '@components/StatusBadge'
-import AvatarUser from '@components/AvatarUser'
 import Pagination from '@components/Pagination'
-import { getFileURL, timeAgo } from '@utils'
+import { getFileURL, timeAgo } from '@/utils'
 
-interface IProjectsProps {
+interface IUsersProps {
   children?: React.ReactNode
 }
 
-const Projects: React.FC<IProjectsProps> = () => {
-  const navigate = useNavigate()
-  const { userLogged } = useAuthenticated()
-  const [projectToDelete, setProjectToDelete] = useState<number | undefined>(undefined)
+const Users: React.FC<IUsersProps> = () => {
+  const [showInviteUserModal, setShowInviteUserModal] = useState(false)
+  const [userToDelete, setUserToDelete] = useState<number | undefined>(undefined)
   const { page, limit, handlePageClick } = usePaginate()
-  const {
-    projects,
-    pageCount,
-    total,
-    refetch,
-    isLoading,
-    isFetching,
-  } = useGetProjectsQuery(
+  const { userLogged } = useAuthenticated()
+  const navigate = useNavigate()
+
+  const { users, total, pageCount, isFetching, isLoading, refetch } = useGetUsersPaginatedQuery(
     { page, limit },
     {
       refetchOnMountOrArgChange: true,
       selectFromResult: ({ data, ...otherProps }) => ({
         total: data?.total ?? 0,
-        projects: data?.data ?? [],
-        // Calculate the 'pageCount' based on the 'total' and 'limit',
+        users: data?.data ?? [],
+        // Calculate the 'pageCount' based on the 'totalProjects' and 'limit',
         // rounding up the result using Math.ceil()
         pageCount: Math.ceil((data?.total ?? 0) / limit),
         ...otherProps
@@ -55,28 +49,53 @@ const Projects: React.FC<IProjectsProps> = () => {
     }
   )
 
+  const _userToDelete = useMemo<Models.User | undefined>(() => {
+    return users.find((user) => user.id === userToDelete)
+  }, [userToDelete])
+
+  useEffect(() => {
+    if (userLogged && !userLogged?.is_admin) {
+      navigate('/projects')
+    }
+  }, [userLogged])
+
   return (
     <>
-      <DeleteProjectModal
-        onClose={() => setProjectToDelete(undefined)}
-        hasTasks={Boolean(projects.find((project) => project.id === projectToDelete)?.tasks_count)}
-        projectId={projectToDelete}
+      <DeleteUserModal
+        user={_userToDelete}
         onDelete={refetch}
+        onClose={() => setUserToDelete(undefined)}
       />
 
-      <Stack direction="row" justifyContent="space-between" alignItems="center" mb={2}>
-        <Typography level="h2">Projects</Typography>
+      <InviteUserModal
+        open={showInviteUserModal}
+        onClose={() => {
+          setShowInviteUserModal(false)
+          refetch()
+        }}
+      />
 
-        {userLogged?.is_admin && (
-          <Button
-            onClick={() => navigate('/projects/new')}
-            startDecorator={<AddIcon />}
-            sx={{ borderRadius: 'xl' }}
-            variant="outlined"
-          >
-            New Project
-          </Button>
-        )}
+      <Stack
+        initial={{ opacity: 0, y: -100 }}
+        transition={{ duration: 0.75 }}
+        animate={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        component={motion.div}
+        justifyContent="space-between"
+        alignItems="center"
+        direction="row"
+        mb={3}
+      >
+        <Typography level="h2">Users</Typography>
+
+        <Button
+          variant="outlined"
+          startDecorator={<AddIcon />}
+          sx={{ borderRadius: 'xl' }}
+          onClick={() => setShowInviteUserModal(true)}
+        >
+          Invite User
+        </Button>
       </Stack>
 
       <motion.div
@@ -85,7 +104,7 @@ const Projects: React.FC<IProjectsProps> = () => {
         viewport={{ once: true }}
         transition={{ duration: 0.75 }}
       >
-        {(!Boolean(projects.length) && !isLoading) && (
+        {(!Boolean(users.length) && !isLoading) && (
           <Card
             variant="outlined"
             sx={{
@@ -98,12 +117,14 @@ const Projects: React.FC<IProjectsProps> = () => {
             {isFetching && <LinearProgress sx={{ position: 'absolute', top: 0, left: 0, right: 0 }} />}
             <Stack>
               <Typography level="h2" textAlign="center">Ohhh no!</Typography>
-              <Typography level="body1" my={2}>You don't have any projects yet</Typography>
+              <Typography level="body1" my={2} textAlign="center">
+                You don't have any users yet,<br />it's time to invite them!
+              </Typography>
             </Stack>
           </Card>
         )}
 
-        {Boolean(projects.length) && (
+        {Boolean(users.length) && (
           <Card
             variant="outlined"
             sx={{
@@ -118,81 +139,78 @@ const Projects: React.FC<IProjectsProps> = () => {
                 <tr>
                   <th></th>
                   <th>Name</th>
-                  <th>Alias</th>
-                  <th>User</th>
-                  <th>Status</th>
-                  <th>Initial Date</th>
-                  <th>Final Date</th>
-                  {userLogged?.is_admin && <th />}
+                  <th>Email</th>
+                  <th>Created At</th>
+                  <th>Updated At</th>
+                  <th></th>
                 </tr>
               </thead>
               <tbody>
-                {projects.map((project, index) => (
+                {users.map((user, index) => (
                   <motion.tr
                     initial={{ x: `${(index % 2 == 0) ? '-' : ''}50%`, opacity: 0 }}
                     transition={{ duration: 0.75, ease: 'easeInOut' }}
                     whileInView={{ x: 0, opacity: 1 }}
                     viewport={{ once: true }}
-                    key={project.id}
+                    key={user.id}
                     onClick={(event) => {
                       event.preventDefault()
                       const target = event.target as HTMLElement
                       const targetTagName = target.tagName.toLowerCase()
                       const allowedTags = ['td', 'tr', 'p']
                       if (!allowedTags.includes(targetTagName)) return
-                      return navigate(`/projects/${project.id}`)
+                      return navigate(`/users/${user.id}/edit`)
                     }}
                   >
                     <td>
                       <Avatar
-                        src={getFileURL(project.avatar)}
+                        src={getFileURL(user.avatar)}
                         sx={{ mx: 'auto' }}
-                        alt={project.name}
+                        alt={user.name}
                         size="sm"
                       >
-                        <ImageIcon />
+                        <PersonIcon />
                       </Avatar>
                     </td>
                     <td>
                       <Typography level="body2" textOverflow="ellipsis" whiteSpace="nowrap" overflow="hidden">
-                        {project.name}
+                        {user.name ?? `Unknown (${user.id})`}
                       </Typography>
                     </td>
                     <td>
                       <Typography level="body2" textOverflow="ellipsis" whiteSpace="nowrap" overflow="hidden">
-                        {project.alias}
-                      </Typography>
-                    </td>
-                    <td>
-                      <Stack direction="row" alignItems="center" justifyContent="center" spacing={1}>
-                        <AvatarUser user={project.user} size="sm" />
-                        <Typography level="body2" textOverflow="ellipsis" whiteSpace="nowrap" overflow="hidden">
-                          {project.user.name ?? `Unknown (${project.user.id})`}
-                        </Typography>
-                      </Stack>
-                    </td>
-                    <td><StatusBadge status={project.status as ProjectStatus} /></td>
-                    <td>
-                      <Typography level="body2" textOverflow="ellipsis" whiteSpace="nowrap" overflow="hidden">
-                        {timeAgo(project.initial_date)}
+                        {user.email}
                       </Typography>
                     </td>
                     <td>
                       <Typography level="body2" textOverflow="ellipsis" whiteSpace="nowrap" overflow="hidden">
-                        {timeAgo(project.final_date)}
+                        {timeAgo(user.created_at)}
                       </Typography>
                     </td>
-                    {userLogged?.is_admin && (
-                      <td>
+                    <td>
+                      <Typography level="body2" textOverflow="ellipsis" whiteSpace="nowrap" overflow="hidden">
+                        {timeAgo(user.updated_at)}
+                      </Typography>
+                    </td>
+                    <td>
+                      <Stack spacing={2} direction="row" justifyContent="center">
                         <IconButton
-                          onClick={() => setProjectToDelete(project.id)}
+                          onClick={() => setUserToDelete(user.id)}
                           variant="outlined"
+                          color="danger"
                           size="sm"
                         >
                           <DeleteIcon />
                         </IconButton>
-                      </td>
-                    )}
+                        <IconButton
+                          onClick={() => navigate(`/users/${user.id}/edit`)}
+                          variant="outlined"
+                          size="sm"
+                        >
+                          <EditIcon />
+                        </IconButton>
+                      </Stack>
+                    </td>
                   </motion.tr>
                 ))}
               </tbody>
@@ -202,10 +220,10 @@ const Projects: React.FC<IProjectsProps> = () => {
       </motion.div>
 
       <motion.div
+        hidden={total < limit}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.75 }}
         initial={{ opacity: 0, y: '-100%' }}
-        hidden={total < limit}
       >
         <Pagination
           currentPage={page}
@@ -217,4 +235,4 @@ const Projects: React.FC<IProjectsProps> = () => {
   )
 }
 
-export default Projects
+export default Users

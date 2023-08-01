@@ -13,7 +13,6 @@ import FormControl from '@mui/joy/FormControl'
 import Typography from '@mui/joy/Typography'
 import FormLabel from '@mui/joy/FormLabel'
 import Textarea from '@mui/joy/Textarea'
-import Avatar from '@mui/joy/Avatar'
 import Select from '@mui/joy/Select'
 import Option from '@mui/joy/Option'
 import Button from '@mui/joy/Button'
@@ -22,9 +21,10 @@ import Input from '@mui/joy/Input'
 import Grid from '@mui/joy/Grid'
 import Box from '@mui/joy/Box'
 
-import { fromSqlTimestampToString, getFileURL, getInitials } from '@utils'
 import { ProjectStatus } from '@/types/project-status.enum'
+import { fromSqlTimestampToString } from '@utils'
 import { useGetUsersQuery } from '@services/api'
+import AvatarUser from '../AvatarUser'
 
 interface IProjectFormProps {
   children?: React.ReactNode
@@ -231,12 +231,10 @@ const ProjectForm: React.FC<IProjectFormProps> = ({ onSubmit, defaultValue }) =>
                 renderOption={(props, option) => (
                   <AutocompleteOption {...props} value={option.id}>
                     <ListItemDecorator>
-                      <Avatar src={getFileURL(option.avatar)}>
-                        {getInitials(option.name)}
-                      </Avatar>
+                      <AvatarUser user={option} size="sm" />
                     </ListItemDecorator>
                     <ListItemContent sx={{ fontSize: 'sm', ml: 1 }}>
-                      {option.name}
+                      {option.name ?? `Unknown (${option.id})`}
                     </ListItemContent>
                   </AutocompleteOption>
                 )}

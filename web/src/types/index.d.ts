@@ -180,6 +180,9 @@ namespace Api {
   }
   // Users
   namespace User {
+    type InviteUserRequest = {
+      email: string
+    }
     type UpdateProfileRequest = { 
       name: string
       email: string

@@ -27,10 +27,11 @@ import { useAuthenticated } from '@hooks/useAuthenticated'
 import CreateTaskModal from '@components/CreateTaskModal'
 import { useGetProjectQuery } from '@services/api'
 import StatusBadge from '@components/StatusBadge'
+import AvatarUser from '@components/AvatarUser'
 import { getFileURL } from '@utils/getFileURL'
-import { getInitials, timeAgo } from '@utils'
 import NotFound from '@assets/not-found.png'
 import TaskCard from '@components/TaskCard'
+import { timeAgo } from '@utils'
 
 interface IProjectDetailProps {
   children?: React.ReactNode
@@ -154,10 +155,8 @@ const ProjectDetail: React.FC<IProjectDetailProps> = () => {
                 <List>
                   <ListItem>
                     <Stack spacing={1} direction="row" alignItems="center">
-                      <Avatar src={getFileURL(project.user?.avatar)}>
-                        {getInitials(project.user?.name)}
-                      </Avatar>
-                      <Typography>{project.user?.name}</Typography>
+                      <AvatarUser user={project.user} />
+                      <Typography>{project.user?.name ?? `Unknown (${project.user?.id})`}</Typography>
                     </Stack>
                   </ListItem>
                 </List>

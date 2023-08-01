@@ -11,16 +11,15 @@ import PersonIcon from '@mui/icons-material/Person'
 import LogoutIcon from '@mui/icons-material/Logout'
 import ListIcon from '@mui/icons-material/List'
 import ListDivider from '@mui/joy/ListDivider'
-import AddIcon from '@mui/icons-material/Add'
 import IconButton from '@mui/joy/IconButton'
 import { useColorScheme } from '@mui/joy'
 import MenuItem from '@mui/joy/MenuItem'
 import Button from '@mui/joy/Button'
 import Switch from '@mui/joy/Switch'
 import Avatar from '@mui/joy/Avatar'
+import Stack from '@mui/joy/Stack'
 import Sheet from '@mui/joy/Sheet'
 import Menu from '@mui/joy/Menu'
-import Box from '@mui/joy/Box'
 
 import { useAuthenticated } from '@hooks/useAuthenticated'
 import { signOut, useAppDispatch } from '@store'
@@ -72,93 +71,92 @@ const Navbar: React.FC<INavbarProps> = () => {
           <img alt="Logo" src={Logo} width={150} />
         </IconButton>
 
-        <Box sx={{ display: 'flex', flexDirection: 'row-reverse', flexShrink: 0 }}>
-          <Box sx={{ display: 'flex', gap: 2 }}>
+        <Stack spacing={2} direction="row">
+          <Button
+            startDecorator={<ListIcon />}
+            sx={{ borderRadius: 'xl' }}
+            variant="outlined"
+            onClick={() => navigate('/projects')}
+          >
+            All Projects
+          </Button>
+
+          {userLogged?.is_admin && (
             <Button
-              startDecorator={<ListIcon />}
-              sx={{ borderRadius: 'xl', display: { xs: 'none', md: 'inline-flex' } }}
+              startDecorator={<PersonIcon />}
+              sx={{ borderRadius: 'xl' }}
               variant="outlined"
-              onClick={() => navigate('/projects')}
+              onClick={() => navigate('/users')}
             >
-              All Projects
+              All Users
             </Button>
+          )}
 
-            {userLogged?.is_admin && (
-              <Button
-                onClick={() => navigate('/projects/new')}
-                startDecorator={<AddIcon />}
-                sx={{ borderRadius: 'xl', display: { xs: 'none', md: 'inline-flex' } }}
-              >
-                New Project
-              </Button>
-            )}
+          <IconButton sx={{ borderRadius: 'xl' }} onClick={(event) => setAnchorEl(event.currentTarget)}>
+            <Avatar src={getFileURL(userLogged?.avatar)} size="sm">
+              {getInitials(userLogged?.name)}
+            </Avatar>
+            <KeyboardArrowDownIcon />
+          </IconButton>
 
-            <IconButton sx={{ borderRadius: 'xl' }} onClick={(event) => setAnchorEl(event.currentTarget)}>
-              <Avatar src={getFileURL(userLogged?.avatar)} size="sm">
-                {getInitials(userLogged?.name)}
-              </Avatar>
-              <KeyboardArrowDownIcon />
-            </IconButton>
-
-            <Menu
-              variant="outlined"
-              anchorEl={anchorEl}
-              component={motion.div}
-              key={Boolean(anchorEl).toString()}
-              viewport={{ once: true }}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              open={Boolean(anchorEl)}
-              onClose={() => setAnchorEl(null)}
-              placement="bottom-start"
-              disablePortal
-              size="sm"
-              sx={{
-                '--ListItemDecorator-size': '24px',
-                '--ListItem-minHeight': '40px',
-                '--ListDivider-gap': '4px',
-                minWidth: 200,
-                zIndex: 10
+          <Menu
+            variant="outlined"
+            anchorEl={anchorEl}
+            component={motion.div}
+            key={Boolean(anchorEl).toString()}
+            viewport={{ once: true }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            open={Boolean(anchorEl)}
+            onClose={() => setAnchorEl(null)}
+            placement="bottom-start"
+            disablePortal
+            size="sm"
+            sx={{
+              '--ListItemDecorator-size': '24px',
+              '--ListItem-minHeight': '40px',
+              '--ListDivider-gap': '4px',
+              minWidth: 200,
+              zIndex: 10
+            }}
+          >
+            <MenuItem
+              onClick={() => {
+                handleCloseMenu()
+                navigate('/profile')
               }}
             >
-              <MenuItem
-                onClick={() => {
-                  handleCloseMenu()
-                  navigate('/profile')
-                }}
+              <ListItemDecorator>
+                <PersonIcon />
+              </ListItemDecorator>
+              Profile
+            </MenuItem>
+            <ListDivider />
+            <MenuItem>
+              <ListItemContent
+                sx={{ textAlign: 'center' }}
+                onClick={() => setMode(mode === 'dark' ? 'light' : 'dark')}
               >
-                <ListItemDecorator>
-                  <PersonIcon />
-                </ListItemDecorator>
-                Profile
-              </MenuItem>
-              <ListDivider />
-              <MenuItem>
-                 <ListItemContent
-                  sx={{textAlign: 'center'}}
-                  onClick={() => setMode(mode === 'dark' ? 'light' : 'dark')}
-                >
-                  <Switch
-                    startDecorator={<LightModeIcon  />}
-                    endDecorator={<DarkModeIcon />}
-                    checked={mode === 'dark'}
-                  />
-                </ListItemContent>
-              </MenuItem>
-              <MenuItem
-                onClick={() => {
-                  handleCloseMenu()
-                  dispatch(signOut())
-                }}
-              >
-                <ListItemDecorator>
-                  <LogoutIcon />
-                </ListItemDecorator>
-                Log out
-              </MenuItem>
-            </Menu>
-          </Box>
-        </Box>
+                <Switch
+                  startDecorator={<LightModeIcon />}
+                  endDecorator={<DarkModeIcon />}
+                  checked={mode === 'dark'}
+                />
+              </ListItemContent>
+            </MenuItem>
+            <MenuItem
+              onClick={() => {
+                handleCloseMenu()
+                dispatch(signOut())
+              }}
+            >
+              <ListItemDecorator>
+                <LogoutIcon />
+              </ListItemDecorator>
+              Log out
+            </MenuItem>
+          </Menu>
+        </Stack>
       </Sheet>
     </motion.header>
   )

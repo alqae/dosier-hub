@@ -66,10 +66,29 @@ export const api = createApi({
     }),
     // Users
     getUsers: builder.query<Models.User[], void>({
-      query: () => `users`,
+      query: () => 'users',
+    }),
+    getUsersPaginated: builder.query<Api.PaginationResponse<Models.User[]>, Api.PaginationRequest>({
+      query: (params) => ({
+        url: 'users',
+        params,
+      }),
     }),
     getUser: builder.query<Models.User, number>({
       query: (id) => `users/${id}`,
+    }),
+    inviteUser: builder.mutation<Models.User, Api.User.InviteUserRequest>({
+      query: (body) => ({
+        url: 'users/invite',
+        method: 'POST',
+        body,
+      }),
+    }),
+    deleteUser: builder.mutation<Models.User, number>({
+      query: (id) => ({
+        url: `users/${id}`,
+        method: 'DELETE',
+      }),
     }),
     updateProfile: builder.mutation<Models.User, Api.User.UpdateProfileRequest & { userId: Models.User['id'] }>({
       query: ({ userId, ...body }) => ({
@@ -96,8 +115,11 @@ export const api = createApi({
       }),
     }),
     // Projects
-    getProjects: builder.query<Models.Project[], void>({
-      query: () => `projects`,
+    getProjects: builder.query<Api.PaginationResponse<Models.Project[]>, Api.PaginationRequest>({
+      query: (params) => ({
+        url: 'projects',
+        params,
+      }),
     }),
     getProject: builder.query<Models.Project, number>({
       query: (id) => `projects/${id}`,
@@ -197,10 +219,15 @@ export const {
   useResetPasswordMutation,
   // Users
   useGetUsersQuery,
+  useGetUsersPaginatedQuery,
   useGetUserQuery,
+  useLazyGetUserLoggedQuery,
+  useLazyGetUserQuery,
   useUpdateProfileMutation,
   useUpdatePasswordMutation,
   useUploadAvatarMutation,
+  useInviteUserMutation,
+  useDeleteUserMutation,
   // Projects
   useGetProjectsQuery,
   useGetProjectQuery,
