@@ -7,10 +7,12 @@ use Illuminate\Http\Request;
 
 class TagController extends Controller
 {
-    public function getAll() {
+    public function getAll()
+    {
         return response()->json(Tag::all());
     }
-    public function createTag(Request $request) {
+    public function createTag(Request $request)
+    {
         $validated = $request->validate([
             'name' => 'required',
             'description' => 'required',

@@ -1,16 +1,22 @@
 import React, { useState } from 'react'
+import { motion } from 'framer-motion'
 import { useNavigate } from 'react-router-dom'
 
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown'
 import ListItemDecorator from '@mui/joy/ListItemDecorator'
+import LightModeIcon from '@mui/icons-material/LightMode'
+import DarkModeIcon from '@mui/icons-material/DarkMode'
+import ListItemContent from '@mui/joy/ListItemContent'
 import PersonIcon from '@mui/icons-material/Person'
 import LogoutIcon from '@mui/icons-material/Logout'
+import ListIcon from '@mui/icons-material/List'
 import ListDivider from '@mui/joy/ListDivider'
 import AddIcon from '@mui/icons-material/Add'
-import ListIcon from '@mui/icons-material/List'
 import IconButton from '@mui/joy/IconButton'
+import { useColorScheme } from '@mui/joy'
 import MenuItem from '@mui/joy/MenuItem'
 import Button from '@mui/joy/Button'
+import Switch from '@mui/joy/Switch'
 import Avatar from '@mui/joy/Avatar'
 import Sheet from '@mui/joy/Sheet'
 import Menu from '@mui/joy/Menu'
@@ -32,9 +38,15 @@ const Navbar: React.FC<INavbarProps> = () => {
   const navigate = useNavigate()
 
   const handleCloseMenu = () => setAnchorEl(null) // close menu
+  const { mode, setMode } = useColorScheme()
 
   return (
-    <header>
+    <motion.header
+      viewport={{ once: true }}
+      initial={{ y: '-100%' }}
+      animate={{ y: 0 }}
+      transition={{ duration: 0.75 }}
+    >
       <Sheet
         variant="solid"
         color="primary"
@@ -91,6 +103,11 @@ const Navbar: React.FC<INavbarProps> = () => {
             <Menu
               variant="outlined"
               anchorEl={anchorEl}
+              component={motion.div}
+              key={Boolean(anchorEl).toString()}
+              viewport={{ once: true }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
               open={Boolean(anchorEl)}
               onClose={() => setAnchorEl(null)}
               placement="bottom-start"
@@ -101,6 +118,7 @@ const Navbar: React.FC<INavbarProps> = () => {
                 '--ListItem-minHeight': '40px',
                 '--ListDivider-gap': '4px',
                 minWidth: 200,
+                zIndex: 10
               }}
             >
               <MenuItem
@@ -115,6 +133,18 @@ const Navbar: React.FC<INavbarProps> = () => {
                 Profile
               </MenuItem>
               <ListDivider />
+              <MenuItem>
+                 <ListItemContent
+                  sx={{textAlign: 'center'}}
+                  onClick={() => setMode(mode === 'dark' ? 'light' : 'dark')}
+                >
+                  <Switch
+                    startDecorator={<LightModeIcon  />}
+                    endDecorator={<DarkModeIcon />}
+                    checked={mode === 'dark'}
+                  />
+                </ListItemContent>
+              </MenuItem>
               <MenuItem
                 onClick={() => {
                   handleCloseMenu()
@@ -130,7 +160,7 @@ const Navbar: React.FC<INavbarProps> = () => {
           </Box>
         </Box>
       </Sheet>
-    </header>
+    </motion.header>
   )
 }
 

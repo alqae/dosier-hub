@@ -90,7 +90,6 @@ const CreateTagModal: React.FC<ICreateTagModalProps> = ({
               <FormLabel>Name</FormLabel>
               <Input
                 type="text"
-                size="lg"
                 placeholder="John Doe"
                 autoComplete="off"
                 error={!!errors.name}
@@ -105,7 +104,6 @@ const CreateTagModal: React.FC<ICreateTagModalProps> = ({
             <FormControl>
               <FormLabel>Description</FormLabel>
               <Textarea
-                size="lg"
                 placeholder="Lorem ipsum dolor sit amet, consectetur adipiscing elit..."
                 minRows={2}
                 error={!!errors.description}
@@ -117,12 +115,8 @@ const CreateTagModal: React.FC<ICreateTagModalProps> = ({
               </Typography>}
             </FormControl>
 
-            <Stack direction="row" justifyContent="flex-end" spacing={2}>
-              <Button variant="plain" color="neutral" onClick={onClose}>
-                Cancel
-              </Button>
-              <Button type="submit">Add</Button>
-            </Stack>
+            <Button type="submit">Add</Button>
+            <Button variant="outlined" color="neutral" onClick={onClose}>Cancel</Button>
           </Stack>
         </form>
       </ModalDialog>

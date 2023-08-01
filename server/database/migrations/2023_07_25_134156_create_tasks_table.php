@@ -19,6 +19,7 @@ return new class extends Migration
             $table->foreign('project_id')->references('id')->on('projects')->after('name');
             $table->string('name')->nullable();
             $table->text('description')->nullable();
+            $table->integer('progress')->default(0);
             $table->string('alias')->unique()->nullable();
             $table->string('status')->nullable(false);
             $table->date('initial_date')->nullable();

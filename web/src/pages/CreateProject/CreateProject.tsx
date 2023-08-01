@@ -1,5 +1,6 @@
 import React from 'react'
 import { toast } from 'react-toastify'
+import { motion } from 'framer-motion'
 import { useNavigate } from 'react-router-dom'
 
 import Typography from '@mui/joy/Typography'
@@ -34,7 +35,15 @@ const CreateProject: React.FC<ICreateProjectProps> = () => {
 
   return (
     <>
-      <Typography level="h2">Create Project</Typography>
+      <Typography
+        level="h2"
+        component={motion.h2}
+        initial={{ x: '-100%' }}
+        animate={{ x: 0 }}
+        transition={{ duration: 0.75 }}
+      >
+        Create Project
+      </Typography>
       <ProjectForm onSubmit={onCreateProject} />
     </>
   )

@@ -35,8 +35,6 @@ export interface ITaskForm {
   description: string | undefined
   alias: string | undefined
   status: TaskStatus
-  initial_date: string | undefined
-  final_date: string | undefined
   time_spend: string | undefined
   users_ids: number[]
 }
@@ -46,8 +44,6 @@ const taskFormSchema = Yup.object().shape({
   description: Yup.string().optional(),
   alias: Yup.string().optional(),
   status: Yup.string().required('Status is required').oneOf(Object.values(TaskStatus)),
-  initial_date: Yup.string().optional(),
-  final_date: Yup.string().optional(),
   time_spend: Yup.string().optional(),
   users_ids: Yup.array().required('Users is required'),
 })
@@ -71,8 +67,6 @@ const TaskForm: React.FC<ITaskFormProps> = ({
       description: '',
       alias: '',
       status: TaskStatus.Todo,
-      initial_date: '',
-      final_date: '',
       time_spend: '',
       users_ids: [],
     },
@@ -88,6 +82,7 @@ const TaskForm: React.FC<ITaskFormProps> = ({
 
   const _onSubmit = (values: ITaskForm) => {
     onSubmit(values)
+    onCancel()
     reset()
   }
 
@@ -97,8 +92,6 @@ const TaskForm: React.FC<ITaskFormProps> = ({
       setValue('status', defaultValue.status as TaskStatus)
       if (defaultValue.description) setValue('description', defaultValue.description)
       if (defaultValue.alias) setValue('alias', defaultValue.alias)
-      if (defaultValue.initial_date) setValue('initial_date', defaultValue.initial_date)
-      if (defaultValue.final_date) setValue('final_date', defaultValue.final_date)
       if (defaultValue.time_spend) setValue('time_spend', defaultValue.time_spend)
       if (defaultValue.users) setValue('users_ids', defaultValue.users.map((user) => user.id))
     }
@@ -111,7 +104,6 @@ const TaskForm: React.FC<ITaskFormProps> = ({
           <FormLabel>Name</FormLabel>
           <Input
             type="text"
-            size="lg"
             placeholder="Lorem ipsum"
             autoComplete="off"
             error={!!errors.name}
@@ -125,7 +117,6 @@ const TaskForm: React.FC<ITaskFormProps> = ({
         <FormControl>
           <FormLabel>Description</FormLabel>
           <Textarea
-            size="lg"
             placeholder="Lorem ipsum dolor sit amet, consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore..."
             autoComplete="off"
             minRows={2}
@@ -133,37 +124,12 @@ const TaskForm: React.FC<ITaskFormProps> = ({
           />
         </FormControl>
 
-        <Grid container spacing={2}>
-          <Grid xs={6} py={0} pl={0}>
-            <FormControl>
-              <FormLabel>Inital Date</FormLabel>
-              <Input
-                type="date"
-                size="lg"
-                {...register('initial_date')}
-              />
-            </FormControl>
-          </Grid>
-
-          <Grid xs={6} py={0} pr={0}>
-            <FormControl>
-              <FormLabel>Final Date</FormLabel>
-              <Input
-                type="date"
-                size="lg"
-                {...register('final_date')}
-              />
-            </FormControl>
-          </Grid>
-        </Grid>
-
         <FormControl>
           <FormLabel> Alias</FormLabel>
           <Input
             type="text"
-            size="lg"
-            placeholder="Lorem..."
             autoComplete="off"
+            placeholder="Lorem..."
             {...register('alias')}
           />
         </FormControl>
@@ -173,7 +139,7 @@ const TaskForm: React.FC<ITaskFormProps> = ({
             <FormControl>
               <FormLabel>Status</FormLabel>
 
-              <Select onChange={handleChangeStatus} defaultValue={TaskStatus.Todo} size="lg">
+              <Select onChange={handleChangeStatus} defaultValue={defaultValue?.status ?? TaskStatus.Todo}>
                 {Object.values(TaskStatus).map((status) => (
                   <Option key={status} value={status}>
                     {status}
@@ -188,9 +154,8 @@ const TaskForm: React.FC<ITaskFormProps> = ({
               <FormLabel>Time Spend</FormLabel>
               <Input
                 type="text"
-                size="lg"
-                placeholder="1h 30m"
                 autoComplete="off"
+                placeholder="1h 30m"
                 {...register('time_spend')}
               />
             </FormControl>
@@ -205,7 +170,6 @@ const TaskForm: React.FC<ITaskFormProps> = ({
             getOptionLabel={(option) => option.name}
             defaultValue={defaultValue?.users}
             placeholder="Choose a user"
-            size="lg"
             onChange={(_, value) => setValue('users_ids', value.map((user) => user.id))}
             renderOption={(props, option) => (
               <AutocompleteOption {...props} value={option.id}>
@@ -214,7 +178,7 @@ const TaskForm: React.FC<ITaskFormProps> = ({
                     {getInitials(option.name)}
                   </Avatar>
                 </ListItemDecorator>
-                <ListItemContent sx={{ fontSize: 'sm' }}>
+                <ListItemContent sx={{ fontSize: 'sm', ml: 1 }}>
                   {option.name}
                 </ListItemContent>
               </AutocompleteOption>
@@ -222,14 +186,8 @@ const TaskForm: React.FC<ITaskFormProps> = ({
           />
         </FormControl>
 
-        <Button type="submit">
-          {defaultValue ? 'Update' : 'Create'}
-        </Button>
-        <Button
-          color="neutral"
-          variant="outlined"
-          onClick={onCancel}
-        >
+        <Button type="submit">{Boolean(defaultValue) ? 'Update' : 'Create'}</Button>
+        <Button color="neutral" variant="outlined" onClick={onCancel}>
           Cancel
         </Button>
       </Stack>

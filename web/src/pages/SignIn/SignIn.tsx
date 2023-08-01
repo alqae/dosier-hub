@@ -67,9 +67,8 @@ const SignIn: React.FC<ISignInProps> = () => {
           <FormLabel>Email</FormLabel>
           <Input
             type="email"
-            size="lg"
-            placeholder="johndoe@email.com"
             autoComplete="off"
+            placeholder="johndoe@email.com"
             error={!!errors.email}
             {...register('email')}
           />
@@ -83,9 +82,8 @@ const SignIn: React.FC<ISignInProps> = () => {
           <FormLabel>Password</FormLabel>
           <Input
             type="password"
-            size="lg"
-            placeholder="password"
             autoComplete="off"
+            placeholder="password"
             error={!!errors.password}
             {...register('password')}
           />

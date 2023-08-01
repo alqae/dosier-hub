@@ -12,18 +12,21 @@ interface ILayoutProps {
 }
 
 const Layout:React.FC<ILayoutProps> = () => {
-  const { isAuthenticated } = useAuthenticated()
   const location = useLocation()
   const isLogin = location.pathname.includes('auth')
+
+  const { isAuthenticated } = useAuthenticated()
 
   return (
     <>
       {isAuthenticated && <Navbar />}
-      <main>
-        <Box sx={{ py: isLogin ? 0 : 4 }} className={isLogin ? '' : 'container'}>
-          <Outlet />
-        </Box>
-      </main>
+      <Box
+        component="main"
+        sx={{ py: isLogin ? 0 : 4 }}
+        className={isLogin ? '' : 'container'}
+      >
+        <Outlet />
+      </Box>
       {isAuthenticated && <Footer />}
     </>
   )

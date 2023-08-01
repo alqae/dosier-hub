@@ -11,4 +11,9 @@ body, #root, .MuiScopedCssBaseline-root {
 
 main {
   flex: 1;
+  z-index: 1;
+}
+
+header {
+  z-index: 2;
 }

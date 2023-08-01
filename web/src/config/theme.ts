@@ -1,10 +1,18 @@
 
 import { extendTheme } from '@mui/joy/styles'
 
-
-// declare module '@mui/joy/styles' {
-//   // No custom tokens found, you can skip the theme augmentation.
-// }
+const primary = {
+  50: '#fff7ed',
+  100: '#ffedd5',
+  200: '#fed7aa',
+  300: '#fdba74',
+  400: '#fb923c',
+  500: '#f97316',
+  600: '#ea580c',
+  700: '#c2410c',
+  800: '#9a3412',
+  900: '#7c2d12'
+}
 
 const theme = extendTheme({
   cssVarPrefix: 'ds',
@@ -16,22 +24,46 @@ const theme = extendTheme({
         }),
       }
     },
+    JoyModal: {
+      styleOverrides: {
+        backdrop: {
+          backdropFilter: 'none',
+        },
+      }
+    },
+    JoyInput: {
+      defaultProps: {
+        size: 'lg'
+      }
+    },
+    JoyAutocomplete: {
+      defaultProps: {
+        size: 'lg'
+      }
+    },
+    JoySelect: {
+      defaultProps: {
+        size: 'lg'
+      }
+    },
+    JoyTable: {
+      styleOverrides: {
+        root: {
+          '--TableCell-height': '40px',
+          '--TableHeader-height': 'calc(1 * var(--TableCell-height))',
+        }
+      }
+    }
   },
   colorSchemes: {
+    light: {
+      palette: {
+        primary
+      }
+    },
     dark: {
       palette: {
-        primary: {
-          50: "#fff7ed",
-          100: "#ffedd5",
-          200: "#fed7aa",
-          300: "#fdba74",
-          400: "#fb923c",
-          500: "#f97316",
-          600: "#ea580c",
-          700: "#c2410c",
-          800: "#9a3412",
-          900: "#7c2d12"
-        }
+        primary 
       }
     },
   }

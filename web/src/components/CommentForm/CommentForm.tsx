@@ -104,12 +104,13 @@ const CommentForm: React.FC<ICommentFormProps> = ({
                 backgroundColor: (theme) => theme.vars.palette.primary[500],
                 opacity: 0.8,
                 p: 1,
+                pb: 2,
                 mx: 0,
-                position: 'absolute',
+                top: -25,
                 width: '100%',
+                position: 'absolute',
                 borderTopLeftRadius: 12,
                 borderTopRightRadius: 12,
-                top: -31,
               }}
               direction="row"
               spacing={2}
@@ -123,7 +124,6 @@ const CommentForm: React.FC<ICommentFormProps> = ({
 
           <FormControl>
             <Input
-              size="md"
               type="text"
               sx={{ m: '0 !important' }}
               placeholder="Type a title for your comment..."
@@ -139,7 +139,6 @@ const CommentForm: React.FC<ICommentFormProps> = ({
 
           <FormControl>
             <Textarea
-              size="md"
               minRows={2}
               sx={{ flex: 1 }}
               placeholder="Type your comment here..."

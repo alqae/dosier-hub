@@ -81,9 +81,8 @@ const SignUp: React.FC<ISignUpProps> = () => {
               <FormLabel>Name</FormLabel>
               <Input
                 type="text"
-                size="lg"
-                placeholder="John Doe"
                 autoComplete="off"
+                placeholder="John Doe"
                 error={!!errors.name}
                 {...register('name')}
               />
@@ -97,9 +96,8 @@ const SignUp: React.FC<ISignUpProps> = () => {
               <FormLabel>Email</FormLabel>
               <Input
                 type="email"
-                size="lg"
-                placeholder="johndoe@email.com"
                 autoComplete="off"
+                placeholder="johndoe@email.com"
                 error={!!errors.email}
                 {...register('email')}
               />
@@ -113,9 +111,8 @@ const SignUp: React.FC<ISignUpProps> = () => {
               <FormLabel>Password</FormLabel>
               <Input
                 type="password"
-                size="lg"
-                placeholder="password"
                 autoComplete="off"
+                placeholder="password"
                 error={!!errors.password}
                 {...register('password')}
               />

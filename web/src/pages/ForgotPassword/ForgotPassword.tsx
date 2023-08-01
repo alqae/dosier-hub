@@ -95,9 +95,8 @@ const ForgotPassword: React.FC<IForgotPasswordProps> = () => {
             <FormLabel>Password</FormLabel>
             <Input
               type="password"
-              size="lg"
-              placeholder="********"
               autoComplete="off"
+              placeholder="********"
               error={!!resetPasswordForm.formState.errors.password}
               {...resetPasswordForm.register('password')}
             />
@@ -111,9 +110,8 @@ const ForgotPassword: React.FC<IForgotPasswordProps> = () => {
             <FormLabel>Confirm password</FormLabel>
             <Input
               type="password"
-              size="lg"
-              placeholder="********"
               autoComplete="off"
+              placeholder="********"
               error={!!resetPasswordForm.formState.errors.confirmPassword}
               {...resetPasswordForm.register('confirmPassword')}
             />
@@ -159,9 +157,8 @@ const ForgotPassword: React.FC<IForgotPasswordProps> = () => {
           <FormLabel>Email</FormLabel>
           <Input
             type="email"
-            size="lg"
-            placeholder="johndoe@email.com"
             autoComplete="off"
+            placeholder="johndoe@email.com"
             error={!!forgotPasswordForm.formState.errors.email}
             {...forgotPasswordForm.register('email')}
           />

@@ -24,6 +24,7 @@ namespace Models {
     final_date: string
     user: Models.User // user id
     user_id: number
+    progress: number
     tasks: Models.Task[] // task id
     tasks_count?: number
   }
@@ -33,8 +34,6 @@ namespace Models {
     description: string
     alias: string
     status: string
-    initial_date: string
-    final_date: string
     time_spend: string
     project: Models.Project
     project_id: number
@@ -42,6 +41,7 @@ namespace Models {
     users: Models.User[]
     users_ids: number[]
     tasks: Models.Task[]
+    progress: number
     comments: Models.Comment[]
   }
 
@@ -74,6 +74,31 @@ namespace Api {
   // Generic types
   type Response<T> = {
     data: T
+  }
+
+  type PaginationRequest = {
+    page: number
+    limit: number
+  }
+
+  type PaginationResponse<T> = {
+    current_page: number
+    data: T
+    first_page_url: string
+    from: number
+    last_page: number
+    last_page_url: string
+    links: {
+      active: boolean
+      url: string
+      label: string
+    }[]
+    next_page_url: string
+    path: string
+    per_page: number
+    prev_page_url?: string
+    to: number
+    total: number
   }
 
   type Error = {
@@ -129,8 +154,6 @@ namespace Api {
         description: string | undefined
         alias: string | undefined
         status: TaskStatus
-        initial_date: string | undefined
-        final_date: string | undefined
         time_spend: string | undefined
         users_ids: number[]
         parent_task_id: number | undefined

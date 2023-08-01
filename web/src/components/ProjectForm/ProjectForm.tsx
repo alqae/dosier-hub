@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react'
-import { useForm } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
+import { useForm } from 'react-hook-form'
+import { motion } from 'framer-motion'
 import * as Yup from 'yup'
 
 import AutocompleteOption from '@mui/joy/AutocompleteOption'
@@ -27,14 +28,13 @@ import { useGetUsersQuery } from '@services/api'
 
 interface IProjectFormProps {
   children?: React.ReactNode
-  onSubmit: (values: IProjectForm, avatar: File | undefined) => void
   defaultValue?: Models.Project
+  onSubmit: (values: IProjectForm, avatar: File | undefined) => void
 }
 
 export interface IProjectForm {
   name: string
   description: string
-  // avatar: string
   alias: string
   status: string
   initial_date: string
@@ -45,7 +45,6 @@ export interface IProjectForm {
 const projectFormSchema = Yup.object().shape({
   name: Yup.string().required('Required'),
   description: Yup.string().required('Required'),
-  // avatar: Yup.b().required('Required'),
   alias: Yup.string().required('Required'),
   status: Yup.string().required('Required'),
   initial_date: Yup.string().required('Required'),
@@ -53,13 +52,9 @@ const projectFormSchema = Yup.object().shape({
   user_id: Yup.number().required('Required'),
 })
 
-const ProjectForm:React.FC<IProjectFormProps> = ({
-  onSubmit,
-  defaultValue,
-}) => {
-  const { data: users } = useGetUsersQuery(undefined, { refetchOnMountOrArgChange: true })
+const ProjectForm: React.FC<IProjectFormProps> = ({ onSubmit, defaultValue }) => {
+  const { data: users = [] } = useGetUsersQuery(undefined, { refetchOnMountOrArgChange: true })
   const [avatar, setAvatar] = React.useState<File | undefined>(undefined)
-  // const [status, setStatus] = React.useState<ProjectStatus>(ProjectStatus.Pending)
   const { handleSubmit, register, setValue, formState: { errors } } = useForm<IProjectForm>({
     defaultValues: {
       name: '',
@@ -72,11 +67,18 @@ const ProjectForm:React.FC<IProjectFormProps> = ({
     resolver: yupResolver(projectFormSchema),
   })
 
-  const handleChangeStatus = (
-    _: React.SyntheticEvent | null,
-    newValue: string | null,
-  ) => {
-    if (newValue) setValue('status', newValue)
+  /**
+   * Handles the change of status value.
+   * 
+   * @param event - The event that triggered the change, or null.
+   * @param newValue - The new value of the status.
+   */
+  const handleChangeStatus = (_: React.SyntheticEvent | null, newValue: string | null) => {
+    // Check if newValue is truthy
+    if (newValue) {
+      // Set the value of 'status' to the new value
+      setValue('status', newValue);
+    }
   }
 
   useEffect(() => {
@@ -94,19 +96,30 @@ const ProjectForm:React.FC<IProjectFormProps> = ({
   return (
     <form onSubmit={handleSubmit((values) => onSubmit(values, avatar))}>
       <Grid container spacing={2} m={0} alignItems="center">
-        <Grid xs={4}>
+        <Grid
+          initial={{ scale: 0, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ duration: 0.75 }}
+          component={motion.div}
+          xs={4}
+        >
           <Box width={300} height={300}>
             <AvatarPicker onChange={(file) => setAvatar(file)} defaultValue={defaultValue?.avatar} />
           </Box>
         </Grid>
 
-        <Grid xs={8}>
+        <Grid
+          initial={{ x: '-50%', opacity: 0 }}
+          animate={{ x: 0, opacity: 1 }}
+          transition={{ duration: 0.75 }}
+          component={motion.div}
+          xs={8}
+        >
           <Stack spacing={2}>
             <FormControl>
               <FormLabel>Name</FormLabel>
               <Input
                 type="text"
-                size="lg"
                 placeholder="Lorem ipsum"
                 autoComplete="off"
                 error={!!errors.name}
@@ -122,7 +135,6 @@ const ProjectForm:React.FC<IProjectFormProps> = ({
             <FormControl>
               <FormLabel>Description</FormLabel>
               <Textarea
-                size="lg"
                 placeholder="Lorem ipsum dolor sit amet, consectetur adipiscing elit...."
                 autoComplete="off"
                 minRows={3}
@@ -141,7 +153,6 @@ const ProjectForm:React.FC<IProjectFormProps> = ({
                   <FormLabel>Alias</FormLabel>
                   <Input
                     type="text"
-                    size="lg"
                     placeholder="Lorem..."
                     autoComplete="off"
                     error={!!errors.alias}
@@ -158,7 +169,7 @@ const ProjectForm:React.FC<IProjectFormProps> = ({
                 <FormControl>
                   <FormLabel>Status</FormLabel>
 
-                  <Select onChange={handleChangeStatus} defaultValue={ProjectStatus.Pending} size="lg">
+                  <Select onChange={handleChangeStatus} defaultValue={ProjectStatus.Pending}>
                     {Object.values(ProjectStatus).map((status) => (
                       <Option key={status} value={status}>
                         {status}
@@ -179,7 +190,6 @@ const ProjectForm:React.FC<IProjectFormProps> = ({
                   <FormLabel>Inital Date</FormLabel>
                   <Input
                     type="date"
-                    size="lg"
                     error={!!errors.initial_date}
                     {...register('initial_date')}
                   />
@@ -195,7 +205,6 @@ const ProjectForm:React.FC<IProjectFormProps> = ({
                   <FormLabel>Final Date</FormLabel>
                   <Input
                     type="date"
-                    size="lg"
                     error={!!errors.final_date}
                     {...register('final_date')}
                   />
@@ -211,13 +220,11 @@ const ProjectForm:React.FC<IProjectFormProps> = ({
               <FormLabel> Leader user</FormLabel>
               <Autocomplete
                 options={users ?? (defaultValue?.user ? [defaultValue.user] : [])}
-                // isOptionEqualToValue={(option, value) => option.id === value}
                 getOptionLabel={(option) => option.name}
                 defaultValue={defaultValue?.user}
                 placeholder="Choose a user"
                 key={defaultValue?.user_id}
                 error={!!errors.user_id}
-                size="lg"
                 onChange={(_, option) => {
                   if (option) setValue('user_id', option?.id)
                 }}
@@ -228,7 +235,7 @@ const ProjectForm:React.FC<IProjectFormProps> = ({
                         {getInitials(option.name)}
                       </Avatar>
                     </ListItemDecorator>
-                    <ListItemContent sx={{ fontSize: 'sm' }}>
+                    <ListItemContent sx={{ fontSize: 'sm', ml: 1 }}>
                       {option.name}
                     </ListItemContent>
                   </AutocompleteOption>
@@ -240,7 +247,7 @@ const ProjectForm:React.FC<IProjectFormProps> = ({
               </Typography>}
             </FormControl>
 
-            <Button type="submit" color="primary" size="lg">
+            <Button type="submit" color="primary">
               {defaultValue ? 'Update' : 'Create'}
             </Button>
           </Stack>

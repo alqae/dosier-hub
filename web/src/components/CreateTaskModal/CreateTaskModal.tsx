@@ -8,6 +8,7 @@ import Modal from '@mui/joy/Modal'
 
 import TaskForm, { type ITaskForm } from '../TaskForm'
 import { useCreateTaskMutation } from '@services/api'
+import { modalTransitionProps } from '@utils'
 
 interface ICreateTaskModalProps {
   children?: React.ReactNode
@@ -34,7 +35,11 @@ const CreateTaskModal: React.FC<ICreateTaskModalProps> = ({
   }
 
   return (
-    <Modal open={Boolean(projectId || taskId)} onClose={onClose}>
+    <Modal
+      open={Boolean(projectId || taskId)}
+      onClose={onClose}
+      {...modalTransitionProps}
+    >
       <ModalDialog sx={{ width: 500, overflow: 'auto' }}>
         <Typography level="h4" fontWeight="bold">
           Create new {taskId ? 'SubTask' : 'Task'}

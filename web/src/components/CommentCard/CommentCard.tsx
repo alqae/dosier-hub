@@ -11,9 +11,9 @@ import Card from '@mui/joy/Card'
 import Link from '@mui/joy/Link'
 import Box from '@mui/joy/Box'
 
+import { getFileURL, getInitials, modalTransitionProps, timeAgo } from '@utils'
 import CommentForm, { type ICommentForm } from '../CommentForm'
 import { useAuthenticated } from '@hooks/useAuthenticated'
-import { getFileURL, getInitials, timeAgo } from '@utils'
 import { useUpdateCommentMutation } from '@services/api'
 import DeleteCommentModal from '../DeleteCommentModal'
 
@@ -43,6 +43,7 @@ const CommentCard: React.FC<ICommentCardProps> = (props) => {
   const [commentToEdit, setCommentToEdit] = useState<number | undefined>(undefined)
   const [updateComment] = useUpdateCommentMutation()
   const { userLogged } = useAuthenticated()
+  const maxLevel = 5
 
   const onUpdateComment = async (values: ICommentForm) => {
     const response = await updateComment({
@@ -72,7 +73,11 @@ const CommentCard: React.FC<ICommentCardProps> = (props) => {
       />
 
       {/* EDIT - COMMENT */}
-      <Modal open={Boolean(commentToEdit)} onClose={() => setCommentToEdit(undefined)}>
+      <Modal
+        open={Boolean(commentToEdit)}
+        onClose={() => setCommentToEdit(undefined)}
+        {...modalTransitionProps} 
+      >
         <ModalDialog sx={{ width: 500, overflow: 'auto' }}>
           <ModalClose variant="outlined" />
           <Typography level="h4" fontWeight="bold">
@@ -93,7 +98,7 @@ const CommentCard: React.FC<ICommentCardProps> = (props) => {
       >
         <Avatar src={getFileURL(user?.avatar)}>{getInitials(user?.name)}</Avatar>
 
-        <Box sx={{ position: 'absolute', right: '1rem', top: '1rem', backgroundColor: 'common.black' }}>
+        <Box sx={{ position: 'absolute', right: '1rem', top: '1rem' }}>
           <Typography level="body2">{timeAgo(created_at)}</Typography>
         </Box>
 
@@ -109,8 +114,12 @@ const CommentCard: React.FC<ICommentCardProps> = (props) => {
             </Stack>
           )}
           <Stack spacing={1} mt={1} direction="row">
-            <Link onClick={() => onReply(props)}>Reply</Link>
-            <Divider orientation="vertical" />
+            {!(level >= maxLevel) && (
+              <>
+                <Link onClick={() => onReply(props)}>Reply</Link>
+                <Divider orientation="vertical" />
+              </>
+            )}
             <Link onClick={() => setCommentToEdit(id)}>Edit</Link>
             {userLogged?.is_admin && (
               <>

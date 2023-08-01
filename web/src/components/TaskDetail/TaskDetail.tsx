@@ -1,8 +1,8 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
 
-import CalendarIcon from '@mui/icons-material/CalendarToday'
+import CalendarIcon from '@mui/icons-material/CalendarMonth'
 import BadgeIcon from '@mui/icons-material/AssignmentInd'
-import ListItemButton from '@mui/joy/ListItemButton'
+import ListItemContent from '@mui/joy/ListItemContent'
 import DeleteIcon from '@mui/icons-material/Delete'
 import ListSubheader from '@mui/joy/ListSubheader'
 import TimeIcon from '@mui/icons-material/Timer'
@@ -22,7 +22,7 @@ import Grid from '@mui/joy/Grid'
 import List from '@mui/joy/List'
 
 import { useLazyGetTaskQuery, useUpdateTaskMutation } from '@services/api'
-import { getFileURL, getInitials, timeAgo } from '@utils'
+import { getFileURL, getInitials, modalTransitionProps, timeAgo } from '@utils'
 import TaskForm, { type ITaskForm } from '../TaskForm'
 import { TaskStatus } from '@/types/task-status.enum'
 import CreateTaskModal from '../CreateTaskModal'
@@ -30,6 +30,7 @@ import DeleteTaskModal from '../DeleteTaskModal'
 import CommentsSection from '../CommentsSection'
 import StatusBadge from '../StatusBadge'
 import TaskCard from '../TaskCard'
+import LinearProgress from '@mui/joy/LinearProgress'
 
 interface ITaskDetailProps extends Models.Task {
   children?: React.ReactNode
@@ -56,8 +57,6 @@ const TaskDetail: React.FC<ITaskDetailProps> = ({
     comments = [],
     users = [],
     tasks: subTasks = [],
-    initial_date,
-    final_date,
     time_spend,
     status,
     parent_task_id,
@@ -79,7 +78,11 @@ const TaskDetail: React.FC<ITaskDetailProps> = ({
   return (
     <>
       {/* EDIT */}
-      <Modal open={showEditTaskModal} onClose={() => setShowEditTaskModal(false)}>
+      <Modal
+        open={showEditTaskModal}
+        onClose={() => setShowEditTaskModal(false)}
+        {...modalTransitionProps}
+      >
         <ModalDialog sx={{ width: 500, overflow: 'auto' }}>
           <Typography level="h4" fontWeight="bold">
             Edit - {task.name}
@@ -119,6 +122,7 @@ const TaskDetail: React.FC<ITaskDetailProps> = ({
       <Modal
         open={show}
         onClose={onClose}
+        {...modalTransitionProps}
         sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}
       >
         <Sheet
@@ -161,6 +165,7 @@ const TaskDetail: React.FC<ITaskDetailProps> = ({
 
               {!Boolean(parent_task_id) && (
                 <>
+                  <LinearProgress determinate value={task.progress} color="success" />
                   <Divider sx={{ my: 3 }} />
                   <Stack direction="row" justifyContent="space-between" alignItems="center" mb={2}>
                     <Typography level="h3" mb={1} fontWeight="bold">SubTasks</Typography>
@@ -180,7 +185,10 @@ const TaskDetail: React.FC<ITaskDetailProps> = ({
                 <TaskCard
                   {...subTask}
                   key={subTask.id}
-                  onUpdated={refetch}
+                  onUpdated={() => {
+                    onUpdated()
+                    refetch()
+                  }}
                 />
               ))}
 
@@ -204,51 +212,44 @@ const TaskDetail: React.FC<ITaskDetailProps> = ({
                 }}
               >
                 <ListItem nested>
-                  <ListSubheader><BadgeIcon sx={{ mr: 1 }} />Alias</ListSubheader>
+                  <ListSubheader>
+                    <Typography startDecorator={<BadgeIcon />} level="body1">
+                      Alias
+                    </Typography>
+                  </ListSubheader>
+
                   <List>
                     <ListItem>
-                      <ListItemButton>{task.alias ?? 'N/A'}</ListItemButton>
+                      <ListItemContent>{task.alias ?? 'N/A'}</ListItemContent>
                     </ListItem>
                   </List>
                 </ListItem>
 
                 <ListItem nested>
-                  <ListSubheader><BadgeIcon sx={{ mr: 1 }} />Created At</ListSubheader>
+                  <ListSubheader>
+                    <Typography startDecorator={<CalendarIcon />} level="body1">
+                      Created at
+                    </Typography>
+                  </ListSubheader>
+
                   <List>
                     <ListItem>
-                      <ListItemButton>{timeAgo(task.created_at)}</ListItemButton>
+                      <ListItemContent>{timeAgo(task.created_at)}</ListItemContent>
                     </ListItem>
                   </List>
-                  </ListItem>
+                </ListItem>
 
                 {Boolean(time_spend) && (
                   <ListItem nested>
-                    <ListSubheader><TimeIcon sx={{ mr: 1 }} />TimeSpend</ListSubheader>
-                    <List>
-                      <ListItem>
-                        <ListItemButton>{time_spend}</ListItemButton>
-                      </ListItem>
-                    </List>
-                  </ListItem>
-                )}
+                    <ListSubheader>
+                      <Typography startDecorator={<TimeIcon />} level="body1">
+                        TimeSpend
+                      </Typography>
+                    </ListSubheader>
 
-                {Boolean(initial_date) && (
-                  <ListItem nested>
-                    <ListSubheader><CalendarIcon sx={{ mr: 1 }} />Initial Date</ListSubheader>
                     <List>
                       <ListItem>
-                        <ListItemButton>{initial_date}</ListItemButton>
-                      </ListItem>
-                    </List>
-                  </ListItem>
-                )}
-
-                {Boolean(final_date) && (
-                  <ListItem nested>
-                    <ListSubheader><CalendarIcon sx={{ mr: 1 }} />Final Date</ListSubheader>
-                    <List>
-                      <ListItem>
-                        <ListItemButton>{final_date}</ListItemButton>
+                        <ListItemContent>{time_spend}</ListItemContent>
                       </ListItem>
                     </List>
                   </ListItem>
@@ -256,7 +257,12 @@ const TaskDetail: React.FC<ITaskDetailProps> = ({
 
                 {Boolean(users.length) && (
                   <ListItem nested>
-                    <ListSubheader><BadgeIcon sx={{ mr: 1 }} />Assigned to</ListSubheader>
+                    <ListSubheader>
+                      <Typography startDecorator={<BadgeIcon />} level="body1">
+                        Assigned to
+                      </Typography>
+                    </ListSubheader>
+
                     <List>
                       {users.map((user) => (
                         <ListItem key={user.id}>

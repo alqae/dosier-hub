@@ -58,6 +58,7 @@ Route::middleware([ 'auth:sanctum' ])->group(function() {
     // ---------------------------- Auth
     Route::post('/sign-out', [AuthController::class, 'signOut']);
 });
+// Files
 Route::get('/files/{filename}', [UserController::class, 'getFile']);
 // Authentication
 Route::post('/sign-up', [AuthController::class, 'signUp']);

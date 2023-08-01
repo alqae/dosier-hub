@@ -1,8 +1,9 @@
 import React, { useEffect } from 'react'
-import * as Yup from 'yup'
-import { toast } from 'react-toastify'
-import { useForm } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
+import { useForm } from 'react-hook-form'
+import { motion } from 'framer-motion'
+import { toast } from 'react-toastify'
+import * as Yup from 'yup'
 
 import LinearProgress from '@mui/joy/LinearProgress'
 import FormControl from '@mui/joy/FormControl'
@@ -100,9 +101,24 @@ const Profile: React.FC<IProfileProps> = () => {
   return (
     <>
       {(isLoading || isLoadingUpdateProfile || isLoadingUpdatePassword) && <LinearProgress />}
-      <Typography level="h2" mb={3}>Profile</Typography>
+      <Typography
+        component={motion.div}
+        initial={{ opacity: 0, y: '-100%' }}
+        transition={{ duration: 0.75 }}
+        animate={{ opacity: 1, y: 0 }}
+        level="h2"
+        mb={3}
+      >
+        Profile
+      </Typography>
       <Grid container spacing={2}>
-        <Grid xs={8}>
+        <Grid
+          xs={8}
+          component={motion.div}
+          initial={{ opacity: 0, x: '-100%' }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.75 }}
+        >
           <Typography level="h4" mb={2}>Personal Information</Typography>
           <form onSubmit={updateProfileForm.handleSubmit(onUpdateProfile)}>
             <Grid container spacing={2}>
@@ -111,9 +127,8 @@ const Profile: React.FC<IProfileProps> = () => {
                   <FormLabel>Name</FormLabel>
                   <Input
                     type="text"
-                    size="lg"
-                    placeholder="John Doe"
                     autoComplete="off"
+                    placeholder="John Doe"
                     error={!!updateProfileForm.formState.errors.name}
                     {...updateProfileForm.register('name')}
                   />
@@ -129,9 +144,8 @@ const Profile: React.FC<IProfileProps> = () => {
                   <FormLabel>Email</FormLabel>
                   <Input
                     type="email"
-                    size="lg"
-                    placeholder="johndoe@email.com"
                     autoComplete="off"
+                    placeholder="johndoe@email.com"
                     error={!!updateProfileForm.formState.errors.email}
                     {...updateProfileForm.register('email')}
                   />
@@ -160,9 +174,8 @@ const Profile: React.FC<IProfileProps> = () => {
                   <FormLabel>Password</FormLabel>
                   <Input
                     type="password"
-                    size="lg"
-                    placeholder="********"
                     autoComplete="off"
+                    placeholder="********"
                     error={!!updatePasswordForm.formState.errors.password}
                     {...updatePasswordForm.register('password')}
                   />
@@ -178,9 +191,8 @@ const Profile: React.FC<IProfileProps> = () => {
                   <FormLabel>Confirm Password</FormLabel>
                   <Input
                     type="password"
-                    size="lg"
-                    placeholder="********"
                     autoComplete="off"
+                    placeholder="********"
                     error={!!updatePasswordForm.formState.errors.password_confirmation}
                     {...updatePasswordForm.register('password_confirmation')}
                   />
@@ -200,7 +212,15 @@ const Profile: React.FC<IProfileProps> = () => {
           </form>
         </Grid>
 
-        <Grid xs={4} display="flex" justifyContent="end">
+        <Grid
+          xs={4}
+          display="flex"
+          justifyContent="end"
+          component={motion.div}
+          initial={{ opacity: 0, scale: 0 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.75 }}
+        >
           <Box width={300} height={300}>
             <AvatarPicker onChange={onUpdateAvatar} defaultValue={user?.avatar} />
           </Box>

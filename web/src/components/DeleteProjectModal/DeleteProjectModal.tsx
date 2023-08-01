@@ -10,6 +10,7 @@ import Modal from '@mui/joy/Modal'
 import Box from '@mui/joy/Box'
 
 import { useDeleteProjectMutation } from '@services/api'
+import { modalTransitionProps } from '@utils'
 
 interface IDeleteProjectModalProps {
   children?: React.ReactNode
@@ -35,7 +36,11 @@ const DeleteProjectModal: React.FC<IDeleteProjectModalProps> = ({
   }
 
   return (
-    <Modal open={Boolean(projectId)} onClose={() => onClose()}>
+    <Modal
+      onClose={onClose}
+      open={Boolean(projectId)}
+      {...modalTransitionProps}
+    >
       <ModalDialog variant="outlined" sx={{ width: 400 }}>
         <Typography
           pb={2}

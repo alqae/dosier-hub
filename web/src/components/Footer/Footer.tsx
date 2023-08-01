@@ -1,14 +1,14 @@
 import React from 'react'
+import { motion } from 'framer-motion'
 
-import GitHubIcon from '@mui/icons-material/GitHub'
 import LinkedInIcon from '@mui/icons-material/LinkedIn'
+import GitHubIcon from '@mui/icons-material/GitHub'
 import Typography from '@mui/joy/Typography'
 import IconButton from '@mui/joy/IconButton'
 import Divider from '@mui/joy/Divider'
 import Sheet from '@mui/joy/Sheet'
-import Link from '@mui/joy/Link'
-
 import Stack from '@mui/joy/Stack'
+import Link from '@mui/joy/Link'
 
 interface IFooterProps {
   children?: React.ReactNode
@@ -18,15 +18,19 @@ const Footer: React.FC<IFooterProps> = () => {
   const year = new Date().getFullYear()
 
   return (
-    <footer>
+    <motion.footer
+      animate={{ y: 0 }}
+      initial={{ y: '100%', overflow: 'hidden' }}
+      transition={{ duration: 0.75 }}
+    >
       <Sheet
         variant="solid"
-        color="neutral"
         invertedColors
         sx={{
           bgcolor: `neutral.800`,
           flexGrow: 1,
           py: 4,
+          backgroundColor: (theme) => theme.vars.palette.background.level2,
           borderRadius: { xs: 0, sm: 'xs' },
           justifyContent: 'center',
           display: 'flex',
@@ -68,12 +72,12 @@ const Footer: React.FC<IFooterProps> = () => {
             <Link href="#">Privacy Policy</Link>
           </Typography>
 
-          <Typography level="body2" sx={{ color: (theme) => theme.vars.palette.text.primary }} textColor="primary" fontWeight="bold">
+          <Typography level="body2" fontWeight="bold" textColor="common.white">
             Copyright {year}
           </Typography>
         </Stack>
       </Sheet>
-    </footer>
+    </motion.footer>
   )
 }
 

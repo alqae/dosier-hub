@@ -1,12 +1,12 @@
 import React, { useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 
-import CircularProgress from '@mui/material/CircularProgress'
 import CalendarIcon from '@mui/icons-material/CalendarMonth'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack'
-import SearchOffIcon from '@mui/icons-material/SearchOff'
+import PersonPinIcon from '@mui/icons-material/PersonPin'
+import ListItemContent from '@mui/joy/ListItemContent'
 import BadgeIcon from '@mui/icons-material/BadgeSharp'
-import ListItemButton from '@mui/joy/ListItemButton'
+import LinearProgress from '@mui/joy/LinearProgress'
 import DeleteIcon from '@mui/icons-material/Delete'
 import ListSubheader from '@mui/joy/ListSubheader'
 import EditIcon from '@mui/icons-material/Edit'
@@ -22,12 +22,14 @@ import List from '@mui/joy/List'
 
 import DeleteProjectModal from '@components/DeleteProjectModal'
 import { ProjectStatus } from '@/types/project-status.enum'
+import ProjectDetailSkeleton from './ProjectDetailSkeleton'
 import { useAuthenticated } from '@hooks/useAuthenticated'
 import CreateTaskModal from '@components/CreateTaskModal'
 import { useGetProjectQuery } from '@services/api'
 import StatusBadge from '@components/StatusBadge'
 import { getFileURL } from '@utils/getFileURL'
 import { getInitials, timeAgo } from '@utils'
+import NotFound from '@assets/not-found.png'
 import TaskCard from '@components/TaskCard'
 
 interface IProjectDetailProps {
@@ -43,32 +45,22 @@ const ProjectDetail: React.FC<IProjectDetailProps> = () => {
 
   const { data: project, isLoading, refetch } = useGetProjectQuery(
     Number(projectId),
-    { skip: !projectId, refetchOnMountOrArgChange: true, refetchOnFocus: true }
+    { skip: !projectId, refetchOnMountOrArgChange: true }
   )
 
-  if (isLoading) {
+  if (!isLoading && !project) {
     return (
       <AspectRatio variant="plain">
-        <CircularProgress />
-      </AspectRatio>
-    )
-  }
-
-  if (!project) {
-    return (
-      <AspectRatio variant="plain">
-        <div>
-          <SearchOffIcon sx={{ color: 'text.tertiary', fontSize: '25rem' }} />
+        <Stack spacing={2}>
+          <Typography level="h1">Oops!</Typography>
+          <Typography level="body2" mb={2}>we couldn't find the project</Typography>
           <div>
-            <Typography level="h1" mb={3}>Project not found</Typography>
-            <Button
-              startDecorator={<ArrowBackIcon />}
-              onClick={() => navigate('/projects')}
-            >
-              Back to projects
-            </Button>
+            <img src={NotFound} alt="not found" width={300} height="auto" />
           </div>
-        </div>
+          <Button sx={{ borderRadius: 'xl' }} onClick={() => navigate('/projects')}>
+            Back to projects
+          </Button>
+        </Stack>
       </AspectRatio>
     )
   }
@@ -77,149 +69,174 @@ const ProjectDetail: React.FC<IProjectDetailProps> = () => {
     <>
       <DeleteProjectModal
         projectId={projectToDelete}
-        hasTasks={Boolean(project.tasks?.length)}
+        hasTasks={Boolean(project?.tasks?.length)}
         onDelete={() => navigate('/projects')}
         onClose={() => setProjectToDelete(undefined)}
       />
 
       <CreateTaskModal
-        projectId={showCreateTaskModal ? project.id : undefined}
+        projectId={showCreateTaskModal ? project?.id : undefined}
         onClose={() => {
           setShowCreateTaskModal(false)
           refetch()
         }}
       />
 
-      <Grid container spacing={5} mt={5}>
-        <Grid xs={8}>
-          <Button
-            variant="plain"
-            startDecorator={<ArrowBackIcon />}
-            onClick={() => navigate('/projects')}
-          >
-            Go Back
-          </Button>
-          <Typography level="h1" mb={3}>{project.name}</Typography>
-
-          <Typography mb={5}>{project.description}</Typography>
-
-          <Stack direction="row" justifyContent="space-between" alignItems="center" mb={2}>
-            <Typography level="h3" mb={1} fontWeight="bold">Tasks</Typography>
-
+      {isLoading && <LinearProgress />}
+      {(isLoading && !project) && <ProjectDetailSkeleton />}
+      {project && (
+        <Grid container spacing={5} mt={5}>
+          <Grid xs={8}>
             <Button
-              startDecorator={<AddIcon />}
-              sx={{ borderRadius: 'xl' }}
-              variant="outlined"
-              onClick={() => setShowCreateTaskModal(true)}
+              variant="plain"
+              startDecorator={<ArrowBackIcon />}
+              onClick={() => navigate('/projects')}
             >
-              Add Task
+              Go Back
             </Button>
-          </Stack>
+            <Typography level="h1" mb={3}>{project.name}</Typography>
 
-          {project.tasks?.map((task) => (
-            <TaskCard
-              {...task}
-              key={task.id}
-              onUpdated={() => refetch()}
-            />
-          ))}
-        </Grid>
+            <Typography mb={5}>{project.description}</Typography>
 
-        <Grid xs={4}>
-          <AspectRatio variant="plain" ratio="1/1">
-            <Avatar
-              src={getFileURL(project.avatar)}
-              sx={{ width: '100%', height: 'auto' }}
-            />
-          </AspectRatio>
+            <LinearProgress determinate value={project.progress} color="success" />
 
-          <StatusBadge
-            status={project.status as ProjectStatus}
-            sx={{mb: 1, mx: 0 }}
-          />
-
-          <List
-            variant="outlined"
-            size="lg"
-            sx={{
-              bgcolor: 'background.body',
-              borderRadius: 'sm',
-              boxShadow: 'sm',
-            }}
-          >
-            <ListItem nested>
-              <ListSubheader><BadgeIcon sx={{ mr: 1 }} />Leader</ListSubheader>
-              <List>
-                <ListItem>
-                  <Stack spacing={1} direction="row" alignItems="center">
-                    <Avatar
-                      src={getFileURL(project.user?.avatar)}
-                    >
-                      {getInitials(project.user?.name)}
-                    </Avatar>
-                    <Typography>{project.user?.name}</Typography>
-                  </Stack>
-                </ListItem>
-              </List>
-            </ListItem>
-
-            <ListItem nested>
-              <ListSubheader><BadgeIcon sx={{ mr: 1 }} />Alias</ListSubheader>
-              <List>
-                <ListItem>
-                  <ListItemButton>{project.alias}</ListItemButton>
-                </ListItem>
-              </List>
-            </ListItem>
-
-            <ListItem nested>
-              <ListSubheader><CalendarIcon sx={{ mr: 1 }} />Initial Date</ListSubheader>
-              <List>
-                <ListItem>
-                  <ListItemButton>{timeAgo(project.initial_date)}</ListItemButton>
-                </ListItem>
-              </List>
-            </ListItem>
-
-            <ListItem nested>
-              <ListSubheader><CalendarIcon sx={{ mr: 1 }} />Final Date</ListSubheader>
-              <List>
-                <ListItem>
-                  <ListItemButton>{timeAgo(project.final_date)}</ListItemButton>
-                </ListItem>
-              </List>
-            </ListItem>
-          </List>
-
-          {userLogged?.is_admin && (
-            <>
-              <Button
-                startDecorator={<EditIcon />}
-                variant="outlined"
-                color="warning"
-                sx={{ mt: 3 }}
-                size="md"
-                fullWidth
-                onClick={() => navigate(`/projects/${projectId}/edit`)}
-              >
-                Edit
-              </Button>
+            <Stack direction="row" justifyContent="space-between" alignItems="center" mt={2} mb={2}>
+              <Typography level="h3" mb={1} fontWeight="bold">Tasks</Typography>
 
               <Button
-                startDecorator={<DeleteIcon />}
+                startDecorator={<AddIcon />}
+                sx={{ borderRadius: 'xl' }}
                 variant="outlined"
-                color="danger"
-                sx={{ mt: 1 }}
-                size="md"
-                fullWidth
-                onClick={() => setProjectToDelete(projectId ? Number(projectId) : undefined)}
+                onClick={() => setShowCreateTaskModal(true)}
               >
-                Delete
+                Add Task
               </Button>
-            </>
-          )}
+            </Stack>
+
+            {project.tasks?.map((task) => (
+              <TaskCard
+                {...task}
+                key={task.id}
+                onUpdated={() => refetch()}
+              />
+            ))}
+          </Grid>
+
+          <Grid xs={4}>
+            <AspectRatio variant="plain" ratio="1/1">
+              <Avatar
+                src={getFileURL(project.avatar)}
+                sx={{ width: '100%', height: 'auto' }}
+              />
+            </AspectRatio>
+
+            <StatusBadge
+              status={project.status as ProjectStatus}
+              sx={{ mb: 1, mx: 0 }}
+            />
+
+            <List
+              variant="outlined"
+              size="lg"
+              sx={{
+                bgcolor: 'background.body',
+                borderRadius: 'sm',
+                boxShadow: 'sm',
+              }}
+            >
+              <ListItem nested>
+                <ListSubheader>
+                  <Typography startDecorator={<PersonPinIcon />} level="body1">
+                    Leader
+                  </Typography>
+                </ListSubheader>
+
+                <List>
+                  <ListItem>
+                    <Stack spacing={1} direction="row" alignItems="center">
+                      <Avatar src={getFileURL(project.user?.avatar)}>
+                        {getInitials(project.user?.name)}
+                      </Avatar>
+                      <Typography>{project.user?.name}</Typography>
+                    </Stack>
+                  </ListItem>
+                </List>
+              </ListItem>
+
+              <ListItem nested>
+
+                <ListSubheader>
+                  <Typography startDecorator={<BadgeIcon />} level="body1">
+                    Alias
+                  </Typography>
+                </ListSubheader>
+
+                <List>
+                  <ListItem>
+                    <ListItemContent>{project.alias}</ListItemContent>
+                  </ListItem>
+                </List>
+              </ListItem>
+
+              <ListItem nested>
+                <ListSubheader>
+                  <Typography startDecorator={<CalendarIcon />} level="body1">
+                    Initial Date
+                  </Typography>
+                </ListSubheader>
+
+                <List>
+                  <ListItem>
+                    <ListItemContent>{timeAgo(project.initial_date)}</ListItemContent>
+                  </ListItem>
+                </List>
+              </ListItem>
+
+              <ListItem nested>
+                <ListSubheader>
+                  <Typography startDecorator={<CalendarIcon />} level="body1">
+                    Final Date
+                  </Typography>
+                </ListSubheader>
+
+                <List>
+                  <ListItem>
+                    <ListItemContent>{timeAgo(project.final_date)}</ListItemContent>
+                  </ListItem>
+                </List>
+              </ListItem>
+            </List>
+
+            {userLogged?.is_admin && (
+              <>
+                <Button
+                  startDecorator={<EditIcon />}
+                  variant="outlined"
+                  color="warning"
+                  sx={{ mt: 3 }}
+                  size="md"
+                  fullWidth
+                  onClick={() => navigate(`/projects/${projectId}/edit`)}
+                >
+                  Edit
+                </Button>
+
+                <Button
+                  startDecorator={<DeleteIcon />}
+                  variant="outlined"
+                  color="danger"
+                  sx={{ mt: 1 }}
+                  size="md"
+                  fullWidth
+                  onClick={() => setProjectToDelete(projectId ? Number(projectId) : undefined)}
+                >
+                  Delete
+                </Button>
+              </>
+            )}
+          </Grid>
         </Grid>
-      </Grid>
+      )}
     </>
   )
 }

@@ -9,10 +9,12 @@ use Illuminate\Support\Facades\Auth;
 
 class CommentController extends Controller
 {
-    public function getComments($id) {
+    public function getComments($id)
+    {
         return response()->json(Comment::where('task_id', $id)->with('user', 'comments')->get());
     }
-    public function createComment($id, Request $request) {
+    public function createComment($id, Request $request)
+    {
         $validated = $request->validate([
             'title' => 'required',
             'comment' => 'required',
@@ -26,9 +28,10 @@ class CommentController extends Controller
         $validated['user_id'] = $user->id;
         $comment = Comment::create($validated);
         $comment->tags()->attach($validated['tags_ids']);
-        return response()->json($comment);  
+        return response()->json($comment);
     }
-    public function updateComment($id, Request $request) {
+    public function updateComment($id, Request $request)
+    {
         $validated = $request->validate([
             'title' => 'required',
             'comment' => 'required',
@@ -40,20 +43,21 @@ class CommentController extends Controller
         /** @var User user */
         $user = Auth::user();
         $validated['user_id'] = $user->id;
-    
+
         $comment = Comment::find($id);
 
         if ($user->is_admin != 1 && $comment->user_id != $user->id) {
-            return response()->json([ 'message' => 'Unauthorized' ], 401);
+            return response()->json(['message' => 'Unauthorized'], 401);
         }
 
         $comment->tags()->sync($validated['tags_ids']);
         $comment->update($validated);
         return response()->json($comment);
     }
-    public function deleteComment($id) {
+    public function deleteComment($id)
+    {
         $comment = Comment::find($id);
         $comment->delete();
-        return response()->json([ 'message' => 'Comment deleted' ]);
+        return response()->json(['message' => 'Comment deleted']);
     }
 }
